@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import React from "react";
 import {
@@ -45,45 +46,17 @@ export default function App() {
       });
 
       return (
-        <Pressable
-          key={index}
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#fff",
-            borderBottomWidth: 1,
-            borderBottomColor: "#fff",
-            marginBottom: 10,
-            padding: 10,
-          }}
-        >
+        <Pressable key={index} style={styles.buttonBorder}>
           <CustomText
             text={title}
             style={{ fontSize: 14, color: "#C5C5C5", margin: 5 }}
           />
-          <View
-            style={{
-              flex: 0,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              marginLeft: 5,
-              marginTop: 5,
-            }}
-          >
+          <View style={styles.slectedTimeBox}>
             <CustomText text={meridiem} style={{ fontSize: 20 }} />
             <CustomText text={HoursMeridiem} style={{ fontSize: 30 }} />
             <CustomText text=":" style={{ fontSize: 30 }} />
             <CustomText text={minutesTwoLength} style={{ fontSize: 30 }} />
-            <View
-              style={{
-                flex: 0.5,
-                flexDirection: "row",
-                gap: 7,
-                marginLeft: 10,
-              }}
-            >
-              {dayItems}
-            </View>
+            <View style={styles.dayItemsBox}>{dayItems}</View>
           </View>
         </Pressable>
       );
@@ -113,16 +86,13 @@ export default function App() {
           />
         )}
       </View>
-      <TouchableOpacity style={{ width: 5, height: 5 }}>
+      <TouchableOpacity
+        onPressIn={() => router.push("/AddAlarm")}
+        style={styles.addButton}
+      >
         <Image
           source={require("../assets/plusButton.png")}
-          style={{
-            position: "absolute",
-            flex: 0.1,
-            left: 100,
-            right: 0,
-            bottom: -20,
-          }}
+          style={styles.addButtonImg}
         />
       </TouchableOpacity>
     </View>
@@ -163,5 +133,35 @@ const styles = StyleSheet.create({
     borderColor: "#ffffff",
     padding: 10,
     textAlign: "center",
+  },
+  buttonBorder: {
+    borderTopWidth: 1,
+    borderTopColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#fff",
+    marginBottom: 10,
+    padding: 10,
+  },
+  slectedTimeBox: {
+    flex: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginLeft: 5,
+    marginTop: 5,
+  },
+  dayItemsBox: {
+    flex: 0.5,
+    flexDirection: "row",
+    gap: 7,
+    marginLeft: 10,
+  },
+  addButton: { width: 5, height: 5 },
+  addButtonImg: {
+    position: "absolute",
+    flex: 0.1,
+    left: 100,
+    right: 0,
+    bottom: -20,
   },
 });

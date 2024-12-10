@@ -1,8 +1,9 @@
+import { router } from "expo-router";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
-import CustomButton from "./components/Custombutton";
-import CustomText from "./components/CustomText";
+import CustomButton from "../components/Custombutton";
+import CustomText from "../components/CustomText";
 
-export default function App() {
+export default function Login() {
   return (
     <View style={styles.container}>
       <CustomText
@@ -10,7 +11,7 @@ export default function App() {
         style={styles.titleText}
       />
       <ImageBackground
-        source={require("./assets/code-beep-bubbles.png")}
+        source={require("../assets/code-beep-bubbles.png")}
         style={styles.bubbles}
       >
         <View style={styles.bubblesBox}>
@@ -21,17 +22,18 @@ export default function App() {
         </View>
       </ImageBackground>
       <Image
-        source={require("./assets/code-beep-icon.png")}
+        source={require("../assets/code-beep-icon.png")}
         style={styles.icon}
       />
       <CustomButton
         title="Github Login"
-        source={require("./assets/github-logo.png")}
+        source={require("../assets/github-logo.png")}
+        onPress={() => router.push("/AlarmList")}
       />
       <View style={styles.googleLoginBox}>
         <Image
           style={styles.googleLoginImg}
-          source={require("./assets/android_light_rd.png")}
+          source={require("../assets/android_light_rd.png")}
         />
       </View>
       <CustomText

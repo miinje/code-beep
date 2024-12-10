@@ -1,4 +1,5 @@
 import { useFonts } from "expo-font";
+import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import { useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
@@ -115,7 +116,7 @@ export default function AddAlarm() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/AlarmList")}>
           <CustomText text="<" style={{ fontSize: 30 }} />
         </TouchableOpacity>
         <CustomText
