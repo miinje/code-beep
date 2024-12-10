@@ -1,5 +1,5 @@
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
-import CustomText from "./components/CustomText";
+import CustomText from "../components/CustomText";
 import { useEffect, useState } from "react";
 
 export default function Loading() {
@@ -20,7 +20,7 @@ export default function Loading() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("./assets/code-beep-bubbles.png")}
+        source={require("../assets/code-beep-bubbles.png")}
         style={styles.backgroundImg}
       >
         <View style={styles.bubblesBox}>
@@ -32,7 +32,7 @@ export default function Loading() {
         </View>
       </ImageBackground>
       <Image
-        source={require("./assets/code-beep-icon.png")}
+        source={require("../assets/code-beep-icon.png")}
         style={styles.iconImage}
       />
       <CustomText
