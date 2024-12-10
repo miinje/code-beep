@@ -10,6 +10,7 @@ export default function CustomButton({ title, onPress, source }) {
         {source ? <Image style={styles.logo} source={source} /> : null}
         <CustomText
           text={`${title}`}
+          textColor="#000000"
           style={[styles.text, { marginRight: margin }]}
         />
       </View>

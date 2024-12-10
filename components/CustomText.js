@@ -1,7 +1,7 @@
 import { useFonts } from "expo-font";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function CustomText({ text, style }) {
+export default function CustomText({ text, textColor = "white", style }) {
   const [isFontsLoaded] = useFonts({
     Neo_Dunggeunmo: require("../assets/NeoDunggeunmoPro-Regular.ttf"),
   });
@@ -12,7 +12,9 @@ export default function CustomText({ text, style }) {
 
   return (
     <View>
-      <Text style={[styles.text, style]}>{`${text}`}</Text>
+      <Text
+        style={[styles.text, { color: textColor }, style]}
+      >{`${text}`}</Text>
     </View>
   );
 }
