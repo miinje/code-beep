@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/code-beep-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#404040"
     },
     "ios": {
       "supportsTablet": true
