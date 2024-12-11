@@ -7,14 +7,14 @@ export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    const currentTimeInterval = setInterval(() => {
+    const intervalId = setInterval(() => {
       const now = new Date();
 
       setCurrentTime(now);
     }, 1000);
 
     return () => {
-      clearInterval(currentTimeInterval);
+      clearInterval(intervalId);
     };
   });
 
@@ -46,7 +46,6 @@ export default function ActionAlarm() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#404040",
