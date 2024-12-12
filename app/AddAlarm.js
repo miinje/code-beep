@@ -53,7 +53,7 @@ export default function AddAlarm() {
   };
 
   const handleHour = (upDown) => {
-    if (selectedHours) {
+    if (selectedHours !== undefined) {
       if (upDown === "up" && selectedHours < 12) {
         setSelectedHours(selectedHours + 1);
       } else if (upDown === "up" && selectedHours >= 12) {
