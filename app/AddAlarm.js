@@ -1,14 +1,17 @@
 import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 
 export default function AddAlarm() {
   const [selectedDays, setSelectedDays] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(new Date());
+  const [selectedHours, setSelectedHours] = useState(1);
+  const [selectedMinutes, setSelectedMinutes] = useState(0);
+  const [selectedDayAndNight, setSelectedDayAndNight] = useState(null);
+  const [saveAlarm, setSaveAlarm] = useState(null);
   const [alarmTitle, setAlarmTitle] = useState("알람");
   const [isFontsLoaded] = useFonts({
     Neo_Dunggeunmo: require("../assets/NeoDunggeunmoPro-Regular.ttf"),
@@ -20,6 +23,79 @@ export default function AddAlarm() {
   }
 
   SystemUI.setBackgroundColorAsync("#404040");
+
+  useEffect(() => {
+    const currentTime = new Date();
+
+    if (currentTime && currentTime.getHours() >= 12) {
+      setSelectedDayAndNight("오후");
+      if (currentTime.getHours() === 12) {
+        setSelectedHours(currentTime.getHours());
+      } else {
+        setSelectedHours(currentTime.getHours() - 12);
+      }
+    } else {
+      setSelectedDayAndNight("오전");
+      setSelectedHours(currentTime.getHours());
+    }
+
+    setSelectedMinutes(currentTime.getMinutes());
+  }, []);
+
+  const handleSelectedDayAndNight = () => {
+    if (selectedDayAndNight === "오전") {
+      setSelectedDayAndNight("오후");
+    } else {
+      setSelectedDayAndNight("오전");
+    }
+  };
+
+  const handleHour = (upDown) => {
+    if (selectedHours) {
+      if (upDown === "up" && selectedHours < 12) {
+        setSelectedHours(selectedHours + 1);
+      } else if (upDown === "up" && selectedHours >= 12) {
+        setSelectedHours(1);
+      } else if (upDown === "down" && selectedHours > 1) {
+        setSelectedHours(selectedHours - 1);
+      } else if (upDown === "down" && selectedHours <= 1) {
+        setSelectedHours(12);
+      }
+    }
+  };
+
+  const handleMinute = (upDown) => {
+    if (selectedMinutes !== undefined) {
+      if (upDown === "up" && selectedMinutes < 59) {
+        setSelectedMinutes(selectedMinutes + 1);
+      } else if (upDown === "up" && selectedMinutes >= 59) {
+        setSelectedMinutes(0);
+      } else if (upDown === "down" && selectedMinutes > 0) {
+        setSelectedMinutes(selectedMinutes - 1);
+      } else if (upDown === "down" && selectedMinutes <= 0) {
+        setSelectedMinutes(59);
+      }
+    }
+  };
+
+  const saveAlarmTime = () => {
+    const newSetTime = new Date();
+
+    if (selectedDayAndNight === "오후") {
+      newSetTime.setUTCHours(
+        selectedHours === 12 ? 12 : selectedHours + 12,
+        selectedMinutes
+      );
+    } else {
+      newSetTime.setUTCHours(selectedHours, selectedMinutes);
+    }
+
+    setSaveAlarm({
+      selectedTime: newSetTime,
+      selectedDays: selectedDays,
+      selectedTitle: alarmTitle,
+    });
+  };
 
   const dayItems = dayArray.map((day) => {
     const isSelected = selectedDays.includes(day);
@@ -35,6 +111,7 @@ export default function AddAlarm() {
         setSelectedDays(newSelectedDays);
       }
     };
+
     return (
       <TouchableOpacity key={day} onPress={handleClickDay}>
         <CustomText
@@ -44,74 +121,6 @@ export default function AddAlarm() {
       </TouchableOpacity>
     );
   });
-
-  const handlePlusHour = () => {
-    if (selectedTime && selectedTime.getHours() < 23) {
-      const newTimeDate = new Date();
-      const hour = selectedTime.getHours();
-
-      newTimeDate.setHours(hour + 1);
-
-      setSelectedTime(newTimeDate);
-    } else {
-      const newTimeDate = new Date();
-
-      newTimeDate.setHours(1);
-
-      setSelectedTime(newTimeDate);
-    }
-  };
-
-  const handleMinusHour = () => {
-    if (selectedTime && selectedTime.getHours() > 1) {
-      const newTimeDate = new Date();
-      const hour = selectedTime.getHours();
-
-      newTimeDate.setHours(hour - 1);
-
-      setSelectedTime(newTimeDate);
-    } else {
-      const newTimeDate = new Date();
-
-      newTimeDate.setHours(23);
-
-      setSelectedTime(newTimeDate);
-    }
-  };
-
-  const handlePlusMinute = () => {
-    if (selectedTime && selectedTime.getMinutes() < 59) {
-      const newTimeDate = new Date();
-      const hour = selectedTime.getMinutes();
-
-      newTimeDate.setMinutes(hour + 1);
-
-      setSelectedTime(newTimeDate);
-    } else {
-      const newTimeDate = new Date();
-
-      newTimeDate.setMinutes(0);
-
-      setSelectedTime(newTimeDate);
-    }
-  };
-
-  const handleMinusMinute = () => {
-    if (selectedTime && selectedTime.getMinutes() > 0) {
-      const newTimeDate = new Date();
-      const hour = selectedTime.getMinutes();
-
-      newTimeDate.setMinutes(hour - 1);
-
-      setSelectedTime(newTimeDate);
-    } else {
-      const newTimeDate = new Date();
-
-      newTimeDate.setMinutes(59);
-
-      setSelectedTime(newTimeDate);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -126,37 +135,61 @@ export default function AddAlarm() {
       </View>
       <View style={styles.alarmSettingBox}>
         <View style={styles.selectedTimeBox}>
-          <TouchableOpacity onPress={handlePlusHour}>
+          <TouchableOpacity
+            onPress={handleSelectedDayAndNight}
+            disabled={selectedDayAndNight === "오전"}
+          >
+            <CustomText
+              text="△"
+              textColor={selectedDayAndNight === "오전" ? "#808080" : "#ffffff"}
+              style={{ fontSize: 30 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleHour("down")}>
             <CustomText text="△" style={{ fontSize: 30 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handlePlusMinute}>
+          <TouchableOpacity onPress={() => handleMinute("down")}>
             <CustomText text="△" style={{ fontSize: 30 }} />
           </TouchableOpacity>
         </View>
         <View style={styles.timeChange}>
           <CustomText
+            text={selectedDayAndNight}
+            style={{ fontSize: 25, marginLeft: 10 }}
+          />
+          <CustomText
             text={
-              String(selectedTime.getHours()).length !== 2
-                ? `0${selectedTime.getHours()}`
-                : selectedTime.getHours()
+              String(selectedHours).length !== 2
+                ? `0${selectedHours}`
+                : selectedHours
             }
             style={{ fontSize: 40, marginLeft: 15 }}
           />
           <CustomText text=":" style={{ fontSize: 40 }} />
           <CustomText
             text={
-              String(selectedTime.getMinutes()).length < 2
-                ? `0${selectedTime.getMinutes()}`
-                : selectedTime.getMinutes()
+              String(selectedMinutes).length < 2
+                ? `0${selectedMinutes}`
+                : selectedMinutes
             }
             style={{ fontSize: 40 }}
           />
         </View>
         <View style={styles.selectedTimeBox}>
-          <TouchableOpacity onPress={handleMinusHour}>
+          <TouchableOpacity
+            onPress={handleSelectedDayAndNight}
+            disabled={selectedDayAndNight === "오후"}
+          >
+            <CustomText
+              text="▽"
+              textColor={selectedDayAndNight === "오후" ? "#808080" : "#ffffff"}
+              style={{ fontSize: 30 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleHour("up")}>
             <CustomText text="▽" style={{ fontSize: 30 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleMinusMinute}>
+          <TouchableOpacity onPress={() => handleMinute("up")}>
             <CustomText text="▽" style={{ fontSize: 30 }} />
           </TouchableOpacity>
         </View>
@@ -175,7 +208,7 @@ export default function AddAlarm() {
           />
         </View>
       </View>
-      <CustomButton title="저장" />
+      <CustomButton title="저장" onPress={saveAlarmTime} />
     </View>
   );
 }
@@ -210,7 +243,7 @@ const styles = StyleSheet.create({
     padding: 10,
     gap: 60,
     marginBottom: 10,
-    marginLeft: 10,
+    marginLeft: 5,
   },
   timeChange: {
     flex: 1,
