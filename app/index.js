@@ -6,7 +6,7 @@ import {
   onAuthStateChanged,
   signInWithCredential,
 } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
@@ -30,7 +30,6 @@ export default function Login() {
     },
     discovery
   );
-  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     handleResponse();
@@ -46,7 +45,6 @@ export default function Login() {
       const credential = GithubAuthProvider.credential(access_token);
       const data = await signInWithCredential(auth, credential);
 
-      setUserInfo(data);
       router.push("/AlarmList");
     }
   }
@@ -65,32 +63,27 @@ export default function Login() {
         text="Code Beep에 오신 것을 환영합니다!"
         style={styles.titleText}
       />
-      <ImageBackground
-        source={require("../assets/code-beep-bubbles.png")}
-        style={styles.bubbles}
-      >
-        <View style={styles.bubblesBox}>
-          <CustomText text="구글 로그인은" textColor="#000000" />
-          <CustomText text="깃헙이 가입된" textColor="#000000" />
-          <CustomText text="구글 계정만" textColor="#000000" />
-          <CustomText text="가능해요! >_" textColor="#000000" />
-        </View>
-      </ImageBackground>
-      <Image
-        source={require("../assets/code-beep-icon.png")}
-        style={styles.icon}
-      />
+      <View>
+        <ImageBackground
+          source={require("../assets/code-beep-bubbles.png")}
+          style={styles.bubbles}
+        >
+          <View style={styles.bubblesBox}>
+            <CustomText text="자바스크립트 파일이" textColor="#000000" />
+            <CustomText text="있는 리포지토리가" textColor="#000000" />
+            <CustomText text="있어야 해요! >_" textColor="#000000" />
+          </View>
+        </ImageBackground>
+        <Image
+          source={require("../assets/code-beep-icon.png")}
+          style={styles.icon}
+        />
+      </View>
       <CustomButton
         title="Github Login"
         source={require("../assets/github-logo.png")}
         onPress={() => promptAsync()}
       />
-      <View style={styles.googleLoginBox}>
-        <Image
-          style={styles.googleLoginImg}
-          source={require("../assets/android_light_rd.png")}
-        />
-      </View>
       <CustomText
         text="로그인 후 이용하실 수 있습니다"
         style={styles.guideText}
@@ -105,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#404040",
-    gap: 15,
+    gap: 20,
   },
   titleText: {
     fontSize: 20,
@@ -126,11 +119,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 5,
+    gap: 7,
     marginBottom: 20,
   },
-  googleLoginBox: { width: 250, height: 55 },
-  googleLoginImg: { width: "100%", height: "100%" },
   guideText: {
     fontSize: 14,
     margin: 10,
