@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { get, getDatabase, ref, set } from "firebase/database";
+import { convertingDay } from "./utils/convertingDay";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -33,36 +34,9 @@ async function saveAlarmData(userId, data) {
   let dayNumber = "";
 
   selectedDays.forEach((day) => {
-    let dayNum = "";
+    const dayValue = convertingDay(day);
 
-    switch (day) {
-      case "월":
-        dayNum = "1";
-        break;
-      case "화":
-        dayNum = "2";
-        break;
-      case "수":
-        dayNum = "3";
-        break;
-      case "목":
-        dayNum = "4";
-        break;
-      case "금":
-        dayNum = "5";
-        break;
-      case "토":
-        dayNum = "6";
-        break;
-      case "일":
-        dayNum = "0";
-        break;
-      default:
-        dayNum = day;
-        break;
-    }
-
-    dayNumber += dayNum;
+    dayNumber += dayValue;
   });
 
   const alarmId =
