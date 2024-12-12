@@ -7,7 +7,7 @@
     "icon": "./assets/code-beep-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "scheme": "your-app-scheme",
+    "scheme": "codebeep",
     "splash": {
       "image": "./assets/code-beep-icon.png",
       "resizeMode": "contain",
@@ -20,14 +20,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/code-beep-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.miinje.codeBeep"
     },
     "web": {
       "favicon": "./assets/code-beep-icon.png"
     },
     "plugins": [
       "expo-router",
-      ["expo-font", { "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"] }]
+      [
+        "expo-font",
+        {
+          "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"]
+        }
+      ]
     ]
   }
 }
