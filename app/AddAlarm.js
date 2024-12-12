@@ -1,10 +1,12 @@
 import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
+import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
+import { auth, saveAlarmData } from "../firebaseConfig.mjs";
 
 export default function AddAlarm() {
   const [selectedDays, setSelectedDays] = useState([]);
@@ -96,6 +98,16 @@ export default function AddAlarm() {
       selectedTitle: alarmTitle,
     });
   };
+
+  useEffect(() => {
+    if (saveAlarm) {
+      onAuthStateChanged(auth, (user) => {
+        saveAlarmData(user.uid, saveAlarm);
+      });
+
+      router.replace("/AlarmList");
+    }
+  }, [saveAlarm]);
 
   const dayItems = dayArray.map((day) => {
     const isSelected = selectedDays.includes(day);
