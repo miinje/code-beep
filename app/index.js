@@ -1,6 +1,11 @@
 import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import { router } from "expo-router";
 import * as webBrowser from "expo-web-browser";
-import { GithubAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  GithubAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+} from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
@@ -34,8 +39,7 @@ export default function Login() {
   async function handleResponse() {
     if (response.type === "success") {
       const { code } = response.params;
-      const { token_type, scope, access_token } =
-        await createTokenWithCode(code);
+      const { access_token } = await createTokenWithCode(code);
 
       if (!access_token) return;
 
@@ -43,8 +47,17 @@ export default function Login() {
       const data = await signInWithCredential(auth, credential);
 
       setUserInfo(data);
+      router.push("/AlarmList");
     }
   }
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/AlarmList");
+      }
+    });
+  });
 
   return (
     <View style={styles.container}>
