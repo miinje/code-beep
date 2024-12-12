@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { get, getDatabase, ref, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -57,16 +57,32 @@ async function saveAlarmData(userId, data) {
       case "일":
         dayNum = "0";
         break;
+      default:
+        dayNum = day;
+        break;
     }
 
     dayNumber += dayNum;
   });
 
   const alarmId =
-    data && `${selectedTime.toTimeString()}${dayNumber}${selectedTitle}`;
+    data &&
+    `${selectedTime.toTimeString().slice(0, 8)}${dayNumber}${selectedTitle}`;
   const alarmRef = ref(database, `${userId}/${alarmId}`);
 
-  await set(alarmRef, data);
+  await set(alarmRef, {
+    selectedTime: `${selectedTime}`,
+    selectedDays: `${selectedDays}`,
+    selectedTitle: `${selectedTitle}`,
+  });
 }
 
-export { app, auth, database, saveAlarmData };
+async function getAlarmData(userId) {
+  const alarmRef = ref(database, `${userId}/`);
+  const snapshot = await get(alarmRef);
+  const data = snapshot.val();
+
+  return data;
+}
+
+export { app, auth, database, saveAlarmData, getAlarmData };
