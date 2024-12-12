@@ -116,7 +116,7 @@ export default function AddAlarm() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/AlarmList")}>
+        <TouchableOpacity onPress={() => router.replace("/AlarmList")}>
           <CustomText text="<" style={{ fontSize: 30 }} />
         </TouchableOpacity>
         <CustomText

@@ -43,16 +43,16 @@ export default function Login() {
       if (!access_token) return;
 
       const credential = GithubAuthProvider.credential(access_token);
-      const data = await signInWithCredential(auth, credential);
+      await signInWithCredential(auth, credential);
 
-      router.push("/AlarmList");
+      router.replace("/AlarmList");
     }
   }
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.push("/AlarmList");
+        router.replace("/AlarmList");
       }
     });
   });
