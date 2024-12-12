@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
-import React from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   Pressable,
@@ -10,31 +11,44 @@ import {
   View,
 } from "react-native";
 import CustomText from "../components/CustomText";
+import { auth, getAlarmData } from "../firebaseConfig.mjs";
 
 export default function App() {
-  const alarmData = [];
+  const [allAlarmData, setAllAlarmData] = useState(null);
 
   SystemUI.setBackgroundColorAsync("#404040");
 
-  const alarmItems =
-    alarmData.length !== 0 &&
-    alarmData.map((data, index) => {
-      const { time, selecteDay, title } = data;
-      const allDay = ["일", "월", "화", "수", "목", "금", "토"];
-      const meridiem = time.getHours() < 12 ? "오전" : "오후";
-      const HoursMeridiem =
-        String(time.getHours()).length < 2
-          ? "0" + time.getHours()
-          : time.getHours() > 12
-            ? `0${time.getHours() - 12}`
-            : time.getHours();
-      const minutesTwoLength =
-        String(time.getMinutes()).length < 2
-          ? "0" + time.getMinutes()
-          : time.getMinutes();
+  useEffect(() => {
+    const getAllAlarmData = async () => {
+      let userUid = "";
 
-      const dayItems = allDay.map((day, index) => {
-        const isSelected = selecteDay.includes(day);
+      onAuthStateChanged(auth, (user) => {
+        userUid = user.uid;
+      });
+
+      const allAlarmData = await getAlarmData(userUid);
+
+      setAllAlarmData(allAlarmData[userUid]);
+    };
+
+    getAllAlarmData();
+  }, []);
+
+  const alarmItems =
+    allAlarmData &&
+    Object.keys(allAlarmData).map((key) => {
+      const { selectedDays, selectedTime, selectedTitle } = allAlarmData[key];
+      const currentTime = new Date(selectedTime);
+      const alarmHour =
+        currentTime.getHours() < 12
+          ? currentTime.getHours()
+          : currentTime.getHours() - 12;
+      const alarmMinute = currentTime.getMinutes();
+      const alarmDayNight = currentTime.getHours() < 12 ? "오전" : "오후";
+      const allDay = ["일", "월", "화", "수", "목", "금", "토"];
+
+      const dayItems = allDay.map((day) => {
+        const isSelected = selectedDays.includes(day);
 
         return (
           <CustomText
@@ -46,16 +60,24 @@ export default function App() {
       });
 
       return (
-        <Pressable key={index} style={styles.buttonBorder}>
+        <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
           <CustomText
-            text={title}
+            text={selectedTitle}
             style={{ fontSize: 14, color: "#C5C5C5", margin: 5 }}
           />
           <View style={styles.slectedTimeBox}>
-            <CustomText text={meridiem} style={{ fontSize: 20 }} />
-            <CustomText text={HoursMeridiem} style={{ fontSize: 30 }} />
+            <CustomText text={alarmDayNight} style={{ fontSize: 20 }} />
+            <CustomText
+              text={String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour}
+              style={{ fontSize: 30 }}
+            />
             <CustomText text=":" style={{ fontSize: 30 }} />
-            <CustomText text={minutesTwoLength} style={{ fontSize: 30 }} />
+            <CustomText
+              text={
+                String(alarmMinute).length < 2 ? "0" + alarmMinute : alarmMinute
+              }
+              style={{ fontSize: 30 }}
+            />
             <View style={styles.dayItemsBox}>{dayItems}</View>
           </View>
         </Pressable>
@@ -68,7 +90,7 @@ export default function App() {
         <View style={styles.alarmListTitleBox}>
           <CustomText text="알람" style={styles.alarmListTitle} />
         </View>
-        {alarmData.length !== 0 ? (
+        {allAlarmData ? (
           <>
             <ScrollView
               style={{
@@ -159,8 +181,8 @@ const styles = StyleSheet.create({
   addButtonImg: {
     position: "absolute",
     flex: 0.1,
-    left: 100,
+    left: 110,
     right: 0,
-    bottom: -20,
+    bottom: -30,
   },
 });
