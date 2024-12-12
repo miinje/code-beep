@@ -32,7 +32,7 @@ export default function App() {
     };
 
     getAllAlarmData();
-  }, []);
+  }, [allAlarmData]);
 
   const alarmItems =
     allAlarmData &&
