@@ -1,16 +1,28 @@
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import CustomText from "./CustomText";
 
-export default function CustomButton({ title, onPress, source }) {
+export default function CustomButton({
+  title,
+  onPress,
+  disabled = false,
+  source,
+}) {
   const margin = source ? 50 : 0;
 
   return (
-    <Pressable style={styles.Button} onPress={onPress}>
+    <Pressable
+      style={[
+        styles.Button,
+        { backgroundColor: disabled ? "#6A6C6C" : "#ffffff" },
+      ]}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <View style={styles.box}>
         {source ? <Image style={styles.logo} source={source} /> : null}
         <CustomText
           text={`${title}`}
-          textColor="#000000"
+          textColor={disabled ? "#c0c0c0" : "#000000"}
           style={[styles.text, { marginRight: margin }]}
         />
       </View>
@@ -23,7 +35,7 @@ const styles = StyleSheet.create({
     flex: 0,
     width: 250,
     height: 55,
-    backgroundColor: "#ffffff",
+
     borderRadius: 50,
   },
   box: {

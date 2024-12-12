@@ -10,8 +10,8 @@ import { auth, saveAlarmData } from "../firebaseConfig.mjs";
 
 export default function AddAlarm() {
   const [selectedDays, setSelectedDays] = useState([]);
-  const [selectedHours, setSelectedHours] = useState(1);
-  const [selectedMinutes, setSelectedMinutes] = useState(0);
+  const [selectedHours, setSelectedHours] = useState(null);
+  const [selectedMinutes, setSelectedMinutes] = useState(null);
   const [selectedDayAndNight, setSelectedDayAndNight] = useState(null);
   const [saveAlarm, setSaveAlarm] = useState(null);
   const [alarmTitle, setAlarmTitle] = useState("알람");
@@ -220,7 +220,11 @@ export default function AddAlarm() {
           />
         </View>
       </View>
-      <CustomButton title="저장" onPress={saveAlarmTime} />
+      <CustomButton
+        title="저장"
+        onPress={saveAlarmTime}
+        disabled={selectedDays.length === 0}
+      />
     </View>
   );
 }
