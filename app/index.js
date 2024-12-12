@@ -1,9 +1,51 @@
-import { router } from "expo-router";
+import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import * as webBrowser from "expo-web-browser";
+import { GithubAuthProvider, signInWithCredential } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
+import { auth } from "../firebaseConfig.mjs";
+import { createTokenWithCode } from "../utils/createTokenWithCode";
+
+webBrowser.maybeCompleteAuthSession();
+
+const discovery = {
+  authorizationEndpoint: "https://github.com/login/oauth/authorize",
+  tokenEndpoint: "https://github.com/login/oauth/access_token",
+  revocationEndpoint: `https://github.com/settings/connections/applications/${process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID}`,
+};
 
 export default function Login() {
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
+      scopes: ["repo", "identity", "user:email"],
+      redirectUri: makeRedirectUri(),
+    },
+    discovery
+  );
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    handleResponse();
+  }, [response]);
+
+  async function handleResponse() {
+    if (response.type === "success") {
+      const { code } = response.params;
+      const { token_type, scope, access_token } =
+        await createTokenWithCode(code);
+
+      if (!access_token) return;
+
+      const credential = GithubAuthProvider.credential(access_token);
+      const data = await signInWithCredential(auth, credential);
+
+      setUserInfo(data);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <CustomText
@@ -28,7 +70,7 @@ export default function Login() {
       <CustomButton
         title="Github Login"
         source={require("../assets/github-logo.png")}
-        onPress={() => router.push("/AlarmList")}
+        onPress={() => promptAsync()}
       />
       <View style={styles.googleLoginBox}>
         <Image
