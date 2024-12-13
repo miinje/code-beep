@@ -1,10 +1,12 @@
-import { StyleSheet, View } from "react-native";
-import CustomText from "../components/CustomText";
+import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
+import { BackHandler, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
+import CustomText from "../components/CustomText";
 
 export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [sound, setSound] = useState(null);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -17,6 +19,30 @@ export default function ActionAlarm() {
       clearInterval(intervalId);
     };
   });
+
+  useEffect(() => {
+    const playSound = async () => {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/K.K.House.mp3"),
+        {
+          shouldPlay: true,
+          isLooping: true,
+        }
+      );
+
+      setSound(sound);
+      await sound.playAsync();
+    };
+
+    playSound();
+  }, []);
+
+  const handleClickDone = async () => {
+    setSound(null);
+    await sound.unloadAsync();
+
+    BackHandler.exitApp();
+  };
 
   return (
     <View style={styles.container}>
@@ -37,7 +63,7 @@ export default function ActionAlarm() {
         <CustomText text="일어날 시간이에요!" style={{ fontSize: 15 }} />
       </View>
       <View style={styles.buttonBox}>
-        <CustomButton title="완료!" />
+        <CustomButton title="완료!" onPress={handleClickDone} />
       </View>
     </View>
   );

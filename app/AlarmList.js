@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
@@ -12,9 +12,13 @@ import {
 } from "react-native";
 import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
+import { convertingDay } from "../utils/convertingDay";
 
 export default function App() {
+  const [isMatched, setIsMatched] = useState(false);
   const [allAlarmData, setAllAlarmData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const router = useRouter();
 
   SystemUI.setBackgroundColorAsync("#404040");
 
@@ -34,15 +38,49 @@ export default function App() {
     getAllAlarmData();
   }, [allAlarmData]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = new Date();
+
+      setCurrentTime(now);
+    }, 1000);
+
+    for (const key in allAlarmData) {
+      const { selectedTime, selectedDays } = allAlarmData[key];
+      const dayNumberArray = [...selectedDays].filter((value) => value !== ",");
+      const convertedTime = new Date(selectedTime);
+
+      dayNumberArray.forEach((day, index) => {
+        const dayValue = convertingDay(day);
+
+        dayNumberArray[index] = dayValue;
+      });
+
+      if (
+        convertedTime.getHours() === currentTime.getHours() &&
+        convertedTime.getMinutes() === currentTime.getMinutes() &&
+        dayNumberArray.includes(currentTime.getDay())
+      ) {
+        setIsMatched(true);
+      }
+    }
+
+    return () => {
+      if (isMatched) {
+        clearInterval(intervalId);
+        setIsMatched(false);
+
+        router.replace("/ActionAlarm");
+      }
+    };
+  });
+
   const alarmItems =
     allAlarmData &&
     Object.keys(allAlarmData).map((key) => {
       const { selectedDays, selectedTime, selectedTitle } = allAlarmData[key];
       const currentTime = new Date(selectedTime);
-      const alarmHour =
-        currentTime.getHours() < 12
-          ? currentTime.getHours()
-          : currentTime.getHours() - 12;
+      const alarmHour = currentTime.getHours() % 12 || 12;
       const alarmMinute = currentTime.getMinutes();
       const alarmDayNight = currentTime.getHours() < 12 ? "오전" : "오후";
       const allDay = ["일", "월", "화", "수", "목", "금", "토"];
@@ -177,7 +215,7 @@ const styles = StyleSheet.create({
     gap: 7,
     marginLeft: 10,
   },
-  addButton: { width: 5, height: 5 },
+  addButton: { width: 2, height: 2 },
   addButtonImg: {
     position: "absolute",
     flex: 0.1,
