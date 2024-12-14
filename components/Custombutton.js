@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "./CustomText";
 
 export default function CustomButton({
@@ -10,7 +10,7 @@ export default function CustomButton({
   const margin = source ? 50 : 0;
 
   return (
-    <Pressable
+    <TouchableOpacity
       style={[
         styles.Button,
         { backgroundColor: disabled ? "#6A6C6C" : "#ffffff" },
@@ -26,7 +26,7 @@ export default function CustomButton({
           style={[styles.text, { marginRight: margin }]}
         />
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
