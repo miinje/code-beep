@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
+import alarmStore from "../store/alarmStore";
 
 export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -54,15 +55,30 @@ export default function ActionAlarm() {
     <View style={styles.container}>
       <View style={styles.topBox}>
         <View style={styles.currentTimeBox}>
-          <CustomText text={currentTime.getHours()} style={styles.titleText} />
-          <CustomText text=":" style={styles.titleText} />
           <CustomText
-            text={currentTime.getMinutes()}
+            text={
+              String(currentTime.getHours()).length < 2
+                ? "0" + currentTime.getHours()
+                : currentTime.getHours()
+            }
             style={styles.titleText}
           />
           <CustomText text=":" style={styles.titleText} />
           <CustomText
-            text={currentTime.getSeconds()}
+            text={
+              String(currentTime.getMinutes()).length < 2
+                ? "0" + currentTime.getMinutes()
+                : currentTime.getMinutes()
+            }
+            style={styles.titleText}
+          />
+          <CustomText text=":" style={styles.titleText} />
+          <CustomText
+            text={
+              String(currentTime.getSeconds()).length < 2
+                ? "0" + currentTime.getSeconds()
+                : currentTime.getSeconds()
+            }
             style={styles.titleText}
           />
         </View>

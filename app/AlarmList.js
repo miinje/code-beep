@@ -13,6 +13,7 @@ import {
 import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import { convertingDay } from "../utils/convertingDay";
+import alarmStore from "../store/alarmStore";
 
 export default function AlarmList() {
   const { isTimeMatched, setIsTimeMatched } = alarmStore();
