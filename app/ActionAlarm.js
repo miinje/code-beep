@@ -6,7 +6,7 @@ import CustomText from "../components/CustomText";
 
 export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [sound, setSound] = useState(null);
+  const [audio, setAudio] = useState(null);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -30,16 +30,17 @@ export default function ActionAlarm() {
         }
       );
 
-      setSound(sound);
-      await sound.playAsync();
+      setAudio(sound);
+
+      await audio.playAsync();
     };
 
     playSound();
   }, []);
 
   const handleClickDone = async () => {
-    setSound(null);
-    await sound.unloadAsync();
+    setAudio(null);
+    await audio.unloadAsync();
 
     BackHandler.exitApp();
   };
@@ -97,6 +98,6 @@ const styles = StyleSheet.create({
     flex: 2,
     alignItems: "center",
     justifyContent: "flex-end",
-    marginBottom: 30,
+    marginBottom: 40,
   },
 });

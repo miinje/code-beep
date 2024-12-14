@@ -14,7 +14,7 @@ import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import { convertingDay } from "../utils/convertingDay";
 
-export default function App() {
+export default function AlarmList() {
   const [isMatched, setIsMatched] = useState(false);
   const [allAlarmData, setAllAlarmData] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -47,30 +47,32 @@ export default function App() {
 
     for (const key in allAlarmData) {
       const { selectedTime, selectedDays } = allAlarmData[key];
-      const dayNumberArray = [...selectedDays].filter((value) => value !== ",");
-      const convertedTime = new Date(selectedTime);
+      const convertedSelectedTime = new Date(selectedTime);
 
-      dayNumberArray.forEach((day, index) => {
-        const dayValue = convertingDay(day);
+      const convertedDaytoNumber = [...selectedDays].filter(
+        (value) => value !== ","
+      );
 
-        dayNumberArray[index] = dayValue;
+      convertedDaytoNumber.forEach((day, index) => {
+        const dayToNumberValue = convertingDay(day);
+
+        convertedDaytoNumber[index] = dayToNumberValue;
       });
 
       if (
-        convertedTime.getHours() === currentTime.getHours() &&
-        convertedTime.getMinutes() === currentTime.getMinutes() &&
-        dayNumberArray.includes(currentTime.getDay())
+        convertedSelectedTime.getHours() === currentTime.getHours() &&
+        convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
+        convertedDaytoNumber.includes(currentTime.getDay())
       ) {
         setIsMatched(true);
+
+        router.replace("/ActionAlarm");
       }
     }
 
     return () => {
       if (isMatched) {
         clearInterval(intervalId);
-        setIsMatched(false);
-
-        router.replace("/ActionAlarm");
       }
     };
   });
@@ -215,12 +217,14 @@ const styles = StyleSheet.create({
     gap: 7,
     marginLeft: 10,
   },
-  addButton: { width: 2, height: 2 },
+  addButton: { width: 5, height: 5 },
   addButtonImg: {
+    width: 60,
+    height: 60,
+    resizeMode: "contain",
     position: "absolute",
     flex: 0.1,
     left: 110,
-    right: 0,
-    bottom: -30,
+    bottom: -20,
   },
 });
