@@ -31,9 +31,12 @@
       [
         "expo-font",
         {
-          "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"]
+          "font": [
+            "./assets/NeoDunggeunmoPro-Regular.ttf"
+          ]
         }
-      ]
+      ],
+      "react-native-background-fetch"
     ]
   }
 }
