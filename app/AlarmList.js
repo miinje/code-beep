@@ -15,7 +15,7 @@ import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import { convertingDay } from "../utils/convertingDay";
 
 export default function AlarmList() {
-  const [isMatched, setIsMatched] = useState(false);
+  const { isTimeMatched, setIsTimeMatched } = alarmStore();
   const [allAlarmData, setAllAlarmData] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const router = useRouter();
@@ -64,14 +64,14 @@ export default function AlarmList() {
         convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
         convertedDaytoNumber.includes(currentTime.getDay())
       ) {
-        setIsMatched(true);
+        setIsTimeMatched(true);
 
         router.replace("/ActionAlarm");
       }
     }
 
     return () => {
-      if (isMatched) {
+      if (isTimeMatched) {
         clearInterval(intervalId);
       }
     };

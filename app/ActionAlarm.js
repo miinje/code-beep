@@ -7,6 +7,7 @@ import CustomText from "../components/CustomText";
 export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [audio, setAudio] = useState(null);
+  const { isTimeMatched, setIsTimeMatched } = alarmStore();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -35,11 +36,15 @@ export default function ActionAlarm() {
       await audio.playAsync();
     };
 
-    playSound();
-  }, []);
+    if (isTimeMatched) {
+      playSound();
+    }
+  }, [isTimeMatched]);
 
   const handleClickDone = async () => {
+    setIsTimeMatched(false);
     setAudio(null);
+
     await audio.unloadAsync();
 
     BackHandler.exitApp();
