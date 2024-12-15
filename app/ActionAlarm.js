@@ -1,14 +1,15 @@
-import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
+import { playAudio, stopAudio } from "../utils/audioPlayer";
+import { useRouter } from "expo-router";
 
 export default function ActionAlarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [audio, setAudio] = useState(null);
   const { isTimeMatched, setIsTimeMatched } = alarmStore();
+  const router = useRouter();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -24,17 +25,7 @@ export default function ActionAlarm() {
 
   useEffect(() => {
     const playSound = async () => {
-      const { sound } = await Audio.Sound.createAsync(
-        require("../assets/K.K.House.mp3"),
-        {
-          shouldPlay: true,
-          isLooping: true,
-        }
-      );
-
-      setAudio(sound);
-
-      await audio.playAsync();
+      await playAudio();
     };
 
     if (isTimeMatched) {
@@ -44,10 +35,10 @@ export default function ActionAlarm() {
 
   const handleClickDone = async () => {
     setIsTimeMatched(false);
-    setAudio(null);
 
-    await audio.unloadAsync();
+    await stopAudio();
 
+    router.replace("/AlarmList");
     BackHandler.exitApp();
   };
 

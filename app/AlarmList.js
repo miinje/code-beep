@@ -63,7 +63,8 @@ export default function AlarmList() {
       if (
         convertedSelectedTime.getHours() === currentTime.getHours() &&
         convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
-        convertedDaytoNumber.includes(currentTime.getDay())
+        convertedDaytoNumber.includes(currentTime.getDay()) &&
+        currentTime.getSeconds() === 0
       ) {
         setIsTimeMatched(true);
 

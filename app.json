@@ -14,7 +14,8 @@
       "backgroundColor": "#404040"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.miinje.codeBeep"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,9 +32,7 @@
       [
         "expo-font",
         {
-          "font": [
-            "./assets/NeoDunggeunmoPro-Regular.ttf"
-          ]
+          "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"]
         }
       ],
       "react-native-background-fetch"
