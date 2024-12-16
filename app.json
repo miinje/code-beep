@@ -35,7 +35,6 @@
           "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"]
         }
       ],
-      "react-native-background-fetch"
     ]
   }
 }
