@@ -10,7 +10,8 @@ import { useEffect } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
-import { auth } from "../firebaseConfig.mjs";
+import { auth, getAlarmData } from "../firebaseConfig.mjs";
+import alarmStore from "../store/alarmStore";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
 
 webBrowser.maybeCompleteAuthSession();
@@ -22,6 +23,7 @@ const discovery = {
 };
 
 export default function Login() {
+  const { setAllAlarmData } = alarmStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -45,13 +47,21 @@ export default function Login() {
       const credential = GithubAuthProvider.credential(access_token);
       await signInWithCredential(auth, credential);
 
+      onAuthStateChanged(auth, async (user) => {
+        const allAlarmData = await getAlarmData(user.uid);
+
+        setAllAlarmData(allAlarmData[user.uid]);
+      });
+
       router.replace("/AlarmList");
     }
   }
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
+        setAllAlarmData(await getAlarmData(user.uid));
+
         router.replace("/AlarmList");
       }
     });

@@ -7,8 +7,10 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import { auth, saveAlarmData } from "../firebaseConfig.mjs";
+import alarmStore from "../store/alarmStore";
 
 export default function AddAlarm() {
+  const { allAlarmData, setAllAlarmData } = alarmStore();
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedHours, setSelectedHours] = useState(null);
   const [selectedMinutes, setSelectedMinutes] = useState(null);
@@ -101,8 +103,10 @@ export default function AddAlarm() {
 
   useEffect(() => {
     if (saveAlarm) {
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, async (user) => {
         saveAlarmData(user.uid, saveAlarm);
+
+        await setAllAlarmData({ ...allAlarmData, saveAlarm });
       });
 
       router.replace("/AlarmList");

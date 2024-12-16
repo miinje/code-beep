@@ -1,6 +1,5 @@
 import { useRouter } from "expo-router";
 import * as SystemUI from "expo-system-ui";
-import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -11,33 +10,15 @@ import {
   View,
 } from "react-native";
 import CustomText from "../components/CustomText";
-import { auth, getAlarmData } from "../firebaseConfig.mjs";
-import { convertingDay } from "../utils/convertingDay";
 import alarmStore from "../store/alarmStore";
+import { convertingDay } from "../utils/convertingDay";
 
 export default function AlarmList() {
-  const { isTimeMatched, setIsTimeMatched } = alarmStore();
-  const [allAlarmData, setAllAlarmData] = useState(null);
+  const { allAlarmData, isTimeMatched, setIsTimeMatched } = alarmStore();
   const [currentTime, setCurrentTime] = useState(new Date());
   const router = useRouter();
 
   SystemUI.setBackgroundColorAsync("#404040");
-
-  useEffect(() => {
-    const getAllAlarmData = async () => {
-      let userUid = "";
-
-      onAuthStateChanged(auth, (user) => {
-        userUid = user.uid;
-      });
-
-      const allAlarmData = await getAlarmData(userUid);
-
-      setAllAlarmData(allAlarmData[userUid]);
-    };
-
-    getAllAlarmData();
-  }, [allAlarmData]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
