@@ -1,37 +1,13 @@
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { BackHandler, StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
-import { playAudio, stopAudio } from "../utils/audioPlayer";
-import { useRouter } from "expo-router";
+import { stopAudio } from "../utils/audioPlayer";
 
 export default function ActionAlarm() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const { isTimeMatched, setIsTimeMatched } = alarmStore();
+  const { currentTime, setIsTimeMatched } = alarmStore();
   const router = useRouter();
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const now = new Date();
-
-      setCurrentTime(now);
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  });
-
-  useEffect(() => {
-    const playSound = async () => {
-      await playAudio();
-    };
-
-    if (isTimeMatched) {
-      playSound();
-    }
-  }, [isTimeMatched]);
 
   const handleClickDone = async () => {
     setIsTimeMatched(false);
