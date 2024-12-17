@@ -1,13 +1,11 @@
 import { useFonts } from "expo-font";
 import { router } from "expo-router";
-import * as SystemUI from "expo-system-ui";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import { auth, saveAlarmData } from "../firebaseConfig.mjs";
-import { isBackgroundTaskRunning } from "../service/backgroundService";
 import alarmStore from "../store/alarmStore";
 
 export default function AddAlarm() {
@@ -26,8 +24,6 @@ export default function AddAlarm() {
   if (!isFontsLoaded) {
     return null;
   }
-
-  SystemUI.setBackgroundColorAsync("#404040");
 
   useEffect(() => {
     const currentTime = new Date();
@@ -95,11 +91,13 @@ export default function AddAlarm() {
       newSetTime.setHours(selectedHours, selectedMinutes);
     }
 
-    setSaveAlarm({
+    const newData = {
       selectedTime: newSetTime,
       selectedDays: selectedDays,
       selectedTitle: alarmTitle,
-    });
+    };
+
+    setSaveAlarm(newData);
   };
 
   useEffect(() => {

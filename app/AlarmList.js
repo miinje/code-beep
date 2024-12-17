@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import React, { useEffect } from "react";
 import {
+  Button,
   Image,
   Pressable,
   ScrollView,
@@ -13,6 +14,7 @@ import CustomText from "../components/CustomText";
 import {
   isBackgroundTaskRunning,
   startBackgroundTask,
+  stopBackgroundTask,
 } from "../service/backgroundService";
 import alarmStore from "../store/alarmStore";
 
@@ -22,17 +24,29 @@ export default function AlarmList() {
 
   SystemUI.setBackgroundColorAsync("#404040");
 
+  const checkRunningStatus = async () => {
+    if (allAlarmData !== null) {
+      startBackgroundTask(allAlarmData);
+    }
+  };
+
   useEffect(() => {
-    const checkRunningStatus = async () => {
+    checkRunningStatus();
+  }, []);
+
+  useEffect(() => {
+    const reStartBackground = async () => {
       const isRunning = await isBackgroundTaskRunning();
 
-      if (allAlarmData !== null && !isRunning) {
-        await startBackgroundTask(allAlarmData);
+      if (isRunning) {
+        await stopBackgroundTask();
       }
+
+      checkRunningStatus();
     };
 
-    checkRunningStatus();
-  });
+    reStartBackground();
+  }, [allAlarmData]);
 
   const alarmItems =
     allAlarmData &&
@@ -114,6 +128,19 @@ export default function AlarmList() {
           style={styles.addButtonImg}
         />
       </TouchableOpacity>
+      <View style={{ flex: 0, left: 200 }}>
+        <Button
+          title=" "
+          color="#404040"
+          style={{
+            width: 1,
+            height: 1,
+            margin: 0,
+            padding: 0,
+            position: "absolute",
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -124,11 +151,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#404040",
-    margin: 50,
+    margin: 40,
     gap: 20,
   },
   alarmListBox: {
-    width: 320,
+    width: 340,
     flex: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -182,6 +209,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     flex: 0.1,
     left: 110,
-    bottom: -20,
+    bottom: -50,
   },
 });

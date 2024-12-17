@@ -4,7 +4,7 @@ import { convertingDay } from "../utils/convertingDay";
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 const checkTimeInBackground = async (taskDataArguments) => {
-  const { allAlarmData, setIsMatched } = taskDataArguments;
+  const { allAlarmData, delay } = taskDataArguments;
 
   const checkingAlarm = {};
 
@@ -24,7 +24,6 @@ const checkTimeInBackground = async (taskDataArguments) => {
 
         convertedDays.forEach((day, index) => {
           const dayToNumberValue = convertingDay(day);
-
           convertedDays[index] = dayToNumberValue;
         });
 
@@ -36,12 +35,10 @@ const checkTimeInBackground = async (taskDataArguments) => {
           checkingAlarm[selectedTime] = selectedTime;
           checkingAlarm[selectedDays] = selectedDays;
           checkingAlarm[selectedTitle] = selectedTitle;
-
-          break;
         }
       }
 
-      await sleep(3000);
+      await sleep(delay);
     }
   } catch (error) {
     console.error(error.message);
@@ -60,7 +57,9 @@ export const startBackgroundTask = async (allAlarmData) => {
       },
       color: "#404040",
       linkURL: "codebeep://ActionAlarm",
-      parameters: { allAlarmData: allAlarmData },
+      parameters: { allAlarmData: allAlarmData, delay: 1000 },
+      startForeground: true,
+      allowExecutionInForeground: true,
     };
 
     try {
