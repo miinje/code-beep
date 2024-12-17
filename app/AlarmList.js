@@ -10,54 +10,28 @@ import {
   View,
 } from "react-native";
 import CustomText from "../components/CustomText";
+import {
+  isBackgroundTaskRunning,
+  startBackgroundTask,
+} from "../service/backgroundService";
 import alarmStore from "../store/alarmStore";
-import { convertingDay } from "../utils/convertingDay";
 
 export default function AlarmList() {
-  const { allAlarmData, isTimeMatched, setIsTimeMatched } = alarmStore();
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const { allAlarmData } = alarmStore();
   const router = useRouter();
 
   SystemUI.setBackgroundColorAsync("#404040");
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      const now = new Date();
+    const checkRunningStatus = async () => {
+      const isRunning = await isBackgroundTaskRunning();
 
-      setCurrentTime(now);
-    }, 1000);
-
-    for (const key in allAlarmData) {
-      const { selectedTime, selectedDays } = allAlarmData[key];
-      const convertedSelectedTime = new Date(selectedTime);
-
-      const convertedDaytoNumber = [...selectedDays].filter(
-        (value) => value !== ","
-      );
-
-      convertedDaytoNumber.forEach((day, index) => {
-        const dayToNumberValue = convertingDay(day);
-
-        convertedDaytoNumber[index] = dayToNumberValue;
-      });
-
-      if (
-        convertedSelectedTime.getHours() === currentTime.getHours() &&
-        convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
-        convertedDaytoNumber.includes(currentTime.getDay()) &&
-        currentTime.getSeconds() === 0
-      ) {
-        setIsTimeMatched(true);
-
-        router.replace("/ActionAlarm");
-      }
-    }
-
-    return () => {
-      if (isTimeMatched) {
-        clearInterval(intervalId);
+      if (allAlarmData !== null && !isRunning) {
+        await startBackgroundTask(allAlarmData);
       }
     };
+
+    checkRunningStatus();
   });
 
   const alarmItems =

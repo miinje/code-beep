@@ -7,6 +7,7 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import { auth, saveAlarmData } from "../firebaseConfig.mjs";
+import { isBackgroundTaskRunning } from "../service/backgroundService";
 import alarmStore from "../store/alarmStore";
 
 export default function AddAlarm() {
@@ -105,9 +106,9 @@ export default function AddAlarm() {
     if (saveAlarm) {
       onAuthStateChanged(auth, async (user) => {
         saveAlarmData(user.uid, saveAlarm);
-
-        await setAllAlarmData({ ...allAlarmData, saveAlarm });
       });
+
+      setAllAlarmData({ ...allAlarmData, saveAlarm });
 
       router.replace("/AlarmList");
     }
