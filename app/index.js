@@ -13,6 +13,7 @@ import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
+import { requestIgnoreBatteryOptimizations } from "../utils/batteryOptimization";
 
 webBrowser.maybeCompleteAuthSession();
 
@@ -52,6 +53,8 @@ export default function Login() {
 
         setAllAlarmData(allAlarmData[user.uid]);
       });
+
+      requestIgnoreBatteryOptimizations();
 
       router.replace("/AlarmList");
     }

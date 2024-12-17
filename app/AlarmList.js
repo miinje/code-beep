@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import * as SystemUI from "expo-system-ui";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   Pressable,
