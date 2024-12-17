@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import BackgroundService from "react-native-background-actions";
 import { convertingDay } from "../utils/convertingDay";
 
@@ -26,7 +27,6 @@ const checkTimeInBackground = async (taskDataArguments) => {
           const dayToNumberValue = convertingDay(day);
           convertedDays[index] = dayToNumberValue;
         });
-
         if (
           convertedDays.includes(currentDays) &&
           convertedSelectedTime.getHours() === currentHours &&
@@ -35,6 +35,8 @@ const checkTimeInBackground = async (taskDataArguments) => {
           checkingAlarm[selectedTime] = selectedTime;
           checkingAlarm[selectedDays] = selectedDays;
           checkingAlarm[selectedTitle] = selectedTitle;
+
+          router.replace("/ActionAlarm");
         }
       }
 

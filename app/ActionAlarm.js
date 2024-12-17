@@ -4,9 +4,10 @@ import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
 import { stopAudio } from "../utils/audioPlayer";
+import { useEffect } from "react";
 
 export default function ActionAlarm() {
-  const { currentTime, setIsTimeMatched } = alarmStore();
+  const { currentTime, setIsTimeMatched, setCurrentTime } = alarmStore();
   const router = useRouter();
 
   const handleClickDone = async () => {
@@ -17,6 +18,12 @@ export default function ActionAlarm() {
     router.replace("/AlarmList");
     BackHandler.exitApp();
   };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+  });
 
   return (
     <View style={styles.container}>
@@ -64,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#404040",
-    gap: 15,
+    gap: 10,
   },
   titleText: {
     fontSize: 80,
@@ -74,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 5,
   },
   topBox: {
     flex: 3,
