@@ -3,6 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import alarmStore from "../store/alarmStore";
 import { playAudio } from "../utils/audioPlayer";
+import * as SystemUI from "expo-system-ui";
+
+SystemUI.setBackgroundColorAsync("#404040");
 
 export default function Layout() {
   const appState = useRef(AppState.currentState);
