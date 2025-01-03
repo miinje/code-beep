@@ -1,52 +1,11 @@
-import { useRouter } from "expo-router";
-import * as SystemUI from "expo-system-ui";
-import React, { useEffect } from "react";
-import {
-  Button,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
-import {
-  isBackgroundTaskRunning,
-  startBackgroundTask,
-  stopBackgroundTask,
-} from "../service/backgroundService";
 import alarmStore from "../store/alarmStore";
+import Header from "./components/Header";
 
 export default function AlarmList() {
   const { allAlarmData } = alarmStore();
-  const router = useRouter();
-
-  SystemUI.setBackgroundColorAsync("#404040");
-
-  const checkRunningStatus = async () => {
-    if (allAlarmData !== null) {
-      startBackgroundTask(allAlarmData);
-    }
-  };
-
-  useEffect(() => {
-    checkRunningStatus();
-  }, []);
-
-  useEffect(() => {
-    const reStartBackground = async () => {
-      const isRunning = await isBackgroundTaskRunning();
-
-      if (isRunning) {
-        await stopBackgroundTask();
-      }
-
-      checkRunningStatus();
-    };
-
-    reStartBackground();
-  }, [allAlarmData]);
 
   const alarmItems =
     allAlarmData &&
@@ -97,16 +56,14 @@ export default function AlarmList() {
 
   return (
     <View style={styles.container}>
+      <Header />
       <View style={styles.alarmListBox}>
-        <View style={styles.alarmListTitleBox}>
-          <CustomText text="알람" style={styles.alarmListTitle} />
-        </View>
         {allAlarmData ? (
           <>
             <ScrollView
               style={{
                 width: "95%",
-                marginTop: 70,
+                marginTop: 10,
               }}
             >
               {alarmItems}
@@ -114,32 +71,10 @@ export default function AlarmList() {
           </>
         ) : (
           <CustomText
-            text="알람을 추가하세요!"
+            text="설정된 알람이 없습니다."
             style={{ fontSize: 20, color: "#C4C4C4" }}
           />
         )}
-      </View>
-      <TouchableOpacity
-        onPressIn={() => router.push("/AddAlarm")}
-        style={styles.addButton}
-      >
-        <Image
-          source={require("../assets/plusButton.png")}
-          style={styles.addButtonImg}
-        />
-      </TouchableOpacity>
-      <View style={{ flex: 0, left: 200 }}>
-        <Button
-          title=" "
-          color="#404040"
-          style={{
-            width: 1,
-            height: 1,
-            margin: 0,
-            padding: 0,
-            position: "absolute",
-          }}
-        />
       </View>
     </View>
   );
@@ -152,13 +87,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#404040",
     margin: 40,
-    gap: 20,
+    gap: 10,
   },
   alarmListBox: {
     width: 340,
-    flex: 10,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    pointerEvents: "auto",
   },
   alarmListTitleBox: {
     width: "100%",
@@ -201,7 +137,13 @@ const styles = StyleSheet.create({
     gap: 7,
     marginLeft: 10,
   },
-  addButton: { width: 5, height: 5 },
+  addButton: {
+    zIndex: 10,
+    width: 10,
+    height: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   addButtonImg: {
     width: 60,
     height: 60,
