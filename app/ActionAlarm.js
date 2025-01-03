@@ -34,28 +34,28 @@ export default function ActionAlarm() {
                 ? "0" + currentTime.getHours()
                 : currentTime.getHours()
             }
-            style={styles.titleText}
+            size={80}
           />
-          <CustomText text=":" style={styles.titleText} />
+          <CustomText text=":" size={80} />
           <CustomText
             text={
               String(currentTime.getMinutes()).length < 2
                 ? "0" + currentTime.getMinutes()
                 : currentTime.getMinutes()
             }
-            style={styles.titleText}
+            size={80}
           />
-          <CustomText text=":" style={styles.titleText} />
+          <CustomText text=":" size={80} />
           <CustomText
             text={
               String(currentTime.getSeconds()).length < 2
                 ? "0" + currentTime.getSeconds()
                 : currentTime.getSeconds()
             }
-            style={styles.titleText}
+            size={80}
           />
         </View>
-        <CustomText text="일어날 시간이에요!" style={{ fontSize: 15 }} />
+        <CustomText text="일어날 시간이에요!" size={15} />
       </View>
       <View style={styles.buttonBox}>
         <CustomButton title="완료!" onPress={handleClickDone} />

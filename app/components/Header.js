@@ -8,12 +8,12 @@ export default function Header() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <CustomText style={{ fontSize: 40 }} text="알람" />
+        <CustomText size={40} text="알람" />
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => router.push("/AddAlarm")}
         >
-          <CustomText style={{ fontSize: 50, textAlign: "center" }} text="+" />
+          <CustomText size={40} text="+" />
         </TouchableOpacity>
       </View>
     </>
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "top",
     pointerEvents: "auto",
   },
   addButton: {

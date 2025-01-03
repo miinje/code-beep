@@ -32,9 +32,9 @@
       [
         "expo-font",
         {
-          "font": ["./assets/NeoDunggeunmoPro-Regular.ttf"]
+          "font": ["./assets/fonts/"]
         }
-      ],
+      ]
     ]
   }
 }

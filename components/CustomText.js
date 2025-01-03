@@ -1,9 +1,9 @@
 import { useFonts } from "expo-font";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function CustomText({ text, textColor = "white", style }) {
+export default function CustomText({ text, textColor = "white", size = 15 }) {
   const [isFontsLoaded] = useFonts({
-    Neo_Dunggeunmo: require("../assets/NeoDunggeunmoPro-Regular.ttf"),
+    "Pretendard-Medium": require("../assets/fonts/Pretendard-Medium.otf"),
   });
 
   if (!isFontsLoaded) {
@@ -13,15 +13,12 @@ export default function CustomText({ text, textColor = "white", style }) {
   return (
     <View>
       <Text
-        style={[styles.text, { color: textColor }, style]}
+        style={{
+          fontFamily: "Pretendard-Medium",
+          color: textColor,
+          fontSize: size,
+        }}
       >{`${text}`}</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  text: {
-    fontFamily: "Neo_Dunggeunmo",
-    fontSize: 15,
-  },
-});

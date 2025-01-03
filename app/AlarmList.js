@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
@@ -24,29 +24,27 @@ export default function AlarmList() {
           <CustomText
             key={day}
             text={day}
-            style={{ color: isSelected ? "#fff" : "#808080", fontSize: 10 }}
+            size={10}
+            textColor={isSelected ? "#fff" : "#808080"}
           />
         );
       });
 
       return (
         <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
-          <CustomText
-            text={selectedTitle}
-            style={{ fontSize: 14, color: "#C5C5C5", margin: 5 }}
-          />
+          <CustomText text={selectedTitle} size={14} textColor="#C5C5C5" />
           <View style={styles.slectedTimeBox}>
-            <CustomText text={alarmDayNight} style={{ fontSize: 20 }} />
+            <CustomText text={alarmDayNight} size={20} />
             <CustomText
               text={String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour}
-              style={{ fontSize: 30 }}
+              size={30}
             />
-            <CustomText text=":" style={{ fontSize: 30 }} />
+            <CustomText text=":" size={30} />
             <CustomText
               text={
                 String(alarmMinute).length < 2 ? "0" + alarmMinute : alarmMinute
               }
-              style={{ fontSize: 30 }}
+              size={30}
             />
             <View style={styles.dayItemsBox}>{dayItems}</View>
           </View>
@@ -72,7 +70,8 @@ export default function AlarmList() {
         ) : (
           <CustomText
             text="설정된 알람이 없습니다."
-            style={{ fontSize: 20, color: "#C4C4C4" }}
+            size={20}
+            textColor="#C4C4C4"
           />
         )}
       </View>

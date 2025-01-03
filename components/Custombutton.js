@@ -7,8 +7,6 @@ export default function CustomButton({
   disabled = false,
   source,
 }) {
-  const margin = source ? 50 : 0;
-
   return (
     <TouchableOpacity
       style={[
@@ -23,7 +21,7 @@ export default function CustomButton({
         <CustomText
           text={`${title}`}
           textColor={disabled ? "#c0c0c0" : "#000000"}
-          style={[styles.text, { marginRight: margin }]}
+          size={21}
         />
       </View>
     </TouchableOpacity>
@@ -35,7 +33,6 @@ const styles = StyleSheet.create({
     flex: 0,
     width: 250,
     height: 55,
-
     borderRadius: 50,
   },
   box: {

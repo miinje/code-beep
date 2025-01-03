@@ -72,10 +72,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <CustomText
-        text="Code Beep에 오신 것을 환영합니다!"
-        style={styles.titleText}
-      />
+      <CustomText text="Code Beep에 오신 것을 환영합니다!" size={20} />
       <View>
         <ImageBackground
           source={require("../assets/code-beep-bubbles.png")}
@@ -99,7 +96,8 @@ export default function Login() {
       />
       <CustomText
         text="로그인 후 이용하실 수 있습니다"
-        style={styles.guideText}
+        size={14}
+        textColor="#808080"
       />
     </View>
   );
@@ -112,10 +110,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#404040",
     gap: 20,
-  },
-  titleText: {
-    fontSize: 20,
-    margin: 20,
   },
   icon: {
     resizeMode: "center",
@@ -134,10 +128,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 7,
     marginBottom: 20,
-  },
-  guideText: {
-    fontSize: 14,
-    margin: 10,
-    color: "#808080",
   },
 });

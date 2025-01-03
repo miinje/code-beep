@@ -1,4 +1,3 @@
-import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -16,14 +15,7 @@ export default function AddAlarm() {
   const [selectedDayAndNight, setSelectedDayAndNight] = useState(null);
   const [saveAlarm, setSaveAlarm] = useState(null);
   const [alarmTitle, setAlarmTitle] = useState("알람");
-  const [isFontsLoaded] = useFonts({
-    Neo_Dunggeunmo: require("../assets/NeoDunggeunmoPro-Regular.ttf"),
-  });
   const dayArray = ["일", "월", "화", "수", "목", "금", "토"];
-
-  if (!isFontsLoaded) {
-    return null;
-  }
 
   useEffect(() => {
     const currentTime = new Date();
@@ -131,7 +123,8 @@ export default function AddAlarm() {
       <TouchableOpacity key={day} onPress={handleClickDay}>
         <CustomText
           text={day}
-          style={{ fontSize: 25, color: isSelected ? "#ffffff" : "#808080" }}
+          size={25}
+          textColor={isSelected ? "#ffffff" : "#808080"}
         />
       </TouchableOpacity>
     );
@@ -141,12 +134,9 @@ export default function AddAlarm() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/AlarmList")}>
-          <CustomText text="<" style={{ fontSize: 30 }} />
+          <CustomText text="<" size={30} />
         </TouchableOpacity>
-        <CustomText
-          text="알람 울릴 시간을 정해 주세요!"
-          style={{ fontSize: 15 }}
-        />
+        <CustomText text="알람 울릴 시간을 정해 주세요!" />
       </View>
       <View style={styles.alarmSettingBox}>
         <View style={styles.selectedTimeBox}>
@@ -157,19 +147,20 @@ export default function AddAlarm() {
             <CustomText
               text="△"
               textColor={selectedDayAndNight === "오전" ? "#808080" : "#ffffff"}
-              style={{ fontSize: 30 }}
+              size={30}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleHour("down")}>
-            <CustomText text="△" style={{ fontSize: 30 }} />
+            <CustomText text="△" size={30} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleMinute("down")}>
-            <CustomText text="△" style={{ fontSize: 30 }} />
+            <CustomText text="△" size={30} />
           </TouchableOpacity>
         </View>
         <View style={styles.timeChange}>
           <CustomText
             text={selectedDayAndNight}
+            size={25}
             style={{ fontSize: 25, marginLeft: 10 }}
           />
           <CustomText
@@ -178,16 +169,17 @@ export default function AddAlarm() {
                 ? `0${selectedHours}`
                 : selectedHours
             }
-            style={{ fontSize: 40, marginLeft: 15 }}
+            size={40}
+            // style={{ fontSize: 40, marginLeft: 15 }}
           />
-          <CustomText text=":" style={{ fontSize: 40 }} />
+          <CustomText text=":" size={40} />
           <CustomText
             text={
               String(selectedMinutes).length < 2
                 ? `0${selectedMinutes}`
                 : selectedMinutes
             }
-            style={{ fontSize: 40 }}
+            size={40}
           />
         </View>
         <View style={styles.selectedTimeBox}>
@@ -198,22 +190,20 @@ export default function AddAlarm() {
             <CustomText
               text="▽"
               textColor={selectedDayAndNight === "오후" ? "#808080" : "#ffffff"}
-              style={{ fontSize: 30 }}
+              size={30}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleHour("up")}>
-            <CustomText text="▽" style={{ fontSize: 30 }} />
+            <CustomText text="▽" size={30} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleMinute("up")}>
-            <CustomText text="▽" style={{ fontSize: 30 }} />
+            <CustomText text="▽" size={30} />
           </TouchableOpacity>
         </View>
         <View style={styles.selectedDayBox}>
-          <CustomText text="요일" style={styles.selectedDayText} />
           <View style={styles.selectedDayItems}>{dayItems}</View>
         </View>
         <View style={styles.alarmTitleBox}>
-          <CustomText text="알람 이름" style={styles.alarmTitleText} />
           <TextInput
             defaultValue={alarmTitle}
             placeholder="알람 이름을 입력해 주세요!"
@@ -301,21 +291,12 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 30,
   },
-  alarmTitleText: {
+  alarmTitleInput: {
     width: 320,
     textAlign: "center",
     padding: 10,
     fontSize: 25,
     borderBottomWidth: 2,
     borderColor: "#ffffff",
-  },
-  alarmTitleInput: {
-    textAlign: "center",
-    borderWidth: 0.5,
-    borderColor: "#ffffff",
-    width: "100%",
-    height: 50,
-    fontFamily: "Neo_Dunggeunmo",
-    color: "#ffffff",
   },
 });
