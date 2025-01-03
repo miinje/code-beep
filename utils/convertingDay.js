@@ -1,4 +1,4 @@
-export function convertingDay(day) {
+export function convertingNumberDay(day) {
   let dayValue = "";
 
   switch (day) {
@@ -22,6 +22,39 @@ export function convertingDay(day) {
       break;
     case "일":
       dayValue = 0;
+      break;
+    default:
+      dayValue = day;
+      break;
+  }
+
+  return dayValue;
+}
+
+export function convertingStringDay(day) {
+  let dayValue = "";
+
+  switch (day) {
+    case 1:
+      dayValue = "월";
+      break;
+    case 2:
+      dayValue = "화";
+      break;
+    case 3:
+      dayValue = "수";
+      break;
+    case 4:
+      dayValue = "목";
+      break;
+    case 5:
+      dayValue = "금";
+      break;
+    case 6:
+      dayValue = "토";
+      break;
+    case 0:
+      dayValue = "일";
       break;
     default:
       dayValue = day;

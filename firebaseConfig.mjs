@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { get, getDatabase, ref, set } from "firebase/database";
-import { convertingDay } from "./utils/convertingDay";
+import { convertingNumberDay } from "./utils/convertingDay";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -34,7 +34,7 @@ async function saveAlarmData(userId, data) {
   let dayNumber = "";
 
   selectedDays.forEach((day) => {
-    const dayValue = convertingDay(day);
+    const dayValue = convertingNumberDay(day);
 
     dayNumber += dayValue;
   });

@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import BackgroundService from "react-native-background-actions";
-import { convertingDay } from "../utils/convertingDay";
+import { convertingNumberDay } from "../utils/convertingDay";
 
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
@@ -24,7 +24,7 @@ const checkTimeInBackground = async (taskDataArguments) => {
         );
 
         convertedDays.forEach((day, index) => {
-          const dayToNumberValue = convertingDay(day);
+          const dayToNumberValue = convertingNumberDay(day);
           convertedDays[index] = dayToNumberValue;
         });
         if (
