@@ -1,5 +1,6 @@
 import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
 import { router } from "expo-router";
+import * as SystemUI from "expo-system-ui";
 import * as webBrowser from "expo-web-browser";
 import {
   GithubAuthProvider,
@@ -12,9 +13,7 @@ import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
-import { requestIgnoreBatteryOptimizations } from "../utils/batteryOptimization";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
-import * as SystemUI from "expo-system-ui";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
@@ -56,8 +55,6 @@ export default function Login() {
 
         setAllAlarmData(allAlarmData[user.uid]);
       });
-
-      requestIgnoreBatteryOptimizations();
 
       router.replace("/AlarmList");
     }

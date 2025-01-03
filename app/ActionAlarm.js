@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
-import { BackHandler, StyleSheet, View } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
 import { stopAudio } from "../utils/audioPlayer";
-import { useEffect } from "react";
 
 export default function ActionAlarm() {
   const { currentTime, setIsTimeMatched, setCurrentTime } = alarmStore();
@@ -16,11 +16,10 @@ export default function ActionAlarm() {
     await stopAudio();
 
     router.replace("/AlarmList");
-    BackHandler.exitApp();
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
   });
