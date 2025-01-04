@@ -31,7 +31,7 @@ export default function CustomButton({
 const styles = StyleSheet.create({
   Button: {
     flex: 0,
-    width: 250,
+    width: "100%",
     height: 55,
     borderRadius: 50,
   },
