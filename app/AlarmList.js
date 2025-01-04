@@ -1,11 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
 import Header from "./components/Header";
+import { convertingStringDay } from "../utils/convertingDay";
+import { router } from "expo-router";
 
 export default function AlarmList() {
-  const { allAlarmData } = alarmStore();
+  const {
+    allAlarmData,
+    isTimeMatched,
+    currentTime,
+    setIsTimeMatched,
+    setCurrentTime,
+  } = alarmStore();
+  const [isIncludedDay, setIncludedDay] = useState(false);
+
+  useEffect(() => {
+    const currentDay = convertingStringDay(new Date().getDay());
+
+    for (const data in allAlarmData) {
+      const { selectedDays } = allAlarmData[data];
+      const convertedDays = [...selectedDays].filter((value) => value !== ",");
+
+      if (convertedDays.includes(convertingStringDay(currentDay))) {
+        setIncludedDay(true);
+      }
+    }
+  }, [allAlarmData]);
+
+  useEffect(() => {
+    if (isIncludedDay) {
+      const intervalId = setInterval(() => {
+        const now = new Date();
+
+        setCurrentTime(now);
+      }, 1000);
+
+      for (const data in allAlarmData) {
+        const { selectedTime } = allAlarmData[data];
+        const convertedSelectedTime = new Date(selectedTime);
+
+        if (
+          convertedSelectedTime.getHours() === currentTime.getHours() &&
+          convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
+          currentTime.getSeconds() === 0
+        ) {
+          setIsTimeMatched(true);
+        }
+      }
+
+      return () => clearInterval(intervalId);
+    }
+  });
+
+  useEffect(() => {
+    if (isTimeMatched) {
+      router.replace("/ActionAlarm");
+    }
+  }, [isTimeMatched]);
 
   const alarmItems =
     allAlarmData &&
