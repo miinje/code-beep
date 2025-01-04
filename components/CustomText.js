@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function CustomText({ text, textColor = "white", size = 15 }) {
   const [isFontsLoaded] = useFonts({
