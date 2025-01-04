@@ -85,20 +85,36 @@ export default function AlarmList() {
 
       return (
         <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
-          <CustomText text={selectedTitle} size={14} textColor="#C5C5C5" />
+          <CustomText text={selectedTitle} size={12} textColor="#C5C5C5" />
           <View style={styles.slectedTimeBox}>
-            <CustomText text={alarmDayNight} size={20} />
-            <CustomText
-              text={String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour}
-              size={30}
-            />
-            <CustomText text=":" size={30} />
-            <CustomText
-              text={
-                String(alarmMinute).length < 2 ? "0" + alarmMinute : alarmMinute
-              }
-              size={30}
-            />
+            <View
+              style={{
+                flex: 0,
+                flexDirection: "row",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                gap: 10,
+              }}
+            >
+              <View style={{ paddingBottom: 3, marginRight: -3 }}>
+                <CustomText text={alarmDayNight} size={16} />
+              </View>
+              <CustomText
+                text={
+                  String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour
+                }
+                size={30}
+              />
+              <CustomText text=":" size={30} />
+              <CustomText
+                text={
+                  String(alarmMinute).length < 2
+                    ? "0" + alarmMinute
+                    : alarmMinute
+                }
+                size={30}
+              />
+            </View>
             <View style={styles.dayItemsBox}>{dayItems}</View>
           </View>
         </Pressable>
@@ -139,7 +155,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#404040",
     margin: 40,
-    gap: 10,
+    gap: 2,
   },
   alarmListBox: {
     width: 340,
@@ -168,20 +184,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonBorder: {
-    borderTopWidth: 1,
-    borderTopColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#fff",
+    height: 90,
+    backgroundColor: "#565656",
+    borderRadius: 10,
+    shadowColor: "#242424",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
     marginBottom: 10,
     padding: 10,
   },
   slectedTimeBox: {
+    width: "70%",
     flex: 0,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 10,
     marginLeft: 5,
-    marginTop: 5,
+    marginTop: 2,
   },
   dayItemsBox: {
     flex: 0.5,
