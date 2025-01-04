@@ -57,7 +57,10 @@ export default function AddAlarm() {
 
     setSaveAlarm({
       selectedTime: newSetTime,
-      selectedDays: selectedDays,
+      selectedDays:
+        selectedDays.length === 0
+          ? [convertingStringDay(newSetTime.getDay())]
+          : selectedDays,
       selectedTitle: selectedTitle,
     });
   };
