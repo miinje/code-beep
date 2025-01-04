@@ -14,6 +14,7 @@ import { auth, saveAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { convertingStringDay } from "../utils/convertingDay";
 import SelectedDays from "./components/SelectedDays";
+import onScroll from "../utils/onScroll";
 
 export default function AddAlarm() {
   const { allAlarmData, setAllAlarmData } = alarmStore();
@@ -37,24 +38,6 @@ export default function AddAlarm() {
   const minutes = Array.from({ length: 60 }, (_, i) => i);
   const amPm = ["오전", "오후"];
   const ITEM_HEIGHT = 40;
-
-  const onScrollHour = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    const index = Math.round(offsetY / ITEM_HEIGHT);
-    setSelectedHours(hours[index % hours.length]);
-  };
-
-  const onScrollMinute = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    const index = Math.round(offsetY / ITEM_HEIGHT);
-    setSelectedMinutes(minutes[index % minutes.length]);
-  };
-
-  const onScrollAmPm = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    const index = Math.round(offsetY / ITEM_HEIGHT);
-    setSelectedAmPm(amPm[index % amPm.length]);
-  };
 
   const clickhandleDayModal = () => {
     setIsOpenDayModal(true);
@@ -107,7 +90,7 @@ export default function AddAlarm() {
             snapToInterval={ITEM_HEIGHT}
             decelerationRate="fast"
             showsVerticalScrollIndicator={false}
-            onScroll={onScrollAmPm}
+            onScroll={(event) => onScroll(event, amPm, setSelectedAmPm)}
             contentOffset={{
               y: amPm.indexOf(selectedAmPm) * ITEM_HEIGHT,
             }}
@@ -132,7 +115,7 @@ export default function AddAlarm() {
             snapToInterval={ITEM_HEIGHT}
             decelerationRate="fast"
             showsVerticalScrollIndicator={false}
-            onScroll={onScrollHour}
+            onScroll={(event) => onScroll(event, hours, setSelectedHours)}
             contentOffset={{
               y:
                 (selectedHours % 12 === 0 ? 11 : (selectedHours % 12) - 1) *
@@ -161,7 +144,7 @@ export default function AddAlarm() {
             snapToInterval={ITEM_HEIGHT}
             decelerationRate="fast"
             showsVerticalScrollIndicator={false}
-            onScroll={onScrollMinute}
+            onScroll={(event) => onScroll(event, minutes, setSelectedMinutes)}
             contentOffset={{
               y: selectedMinutes * ITEM_HEIGHT,
             }}
