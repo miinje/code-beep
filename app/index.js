@@ -8,8 +8,7 @@ import {
   signInWithCredential,
 } from "firebase/auth";
 import { useEffect } from "react";
-import { Image, ImageBackground, StyleSheet, View } from "react-native";
-import CustomButton from "../components/Custombutton";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
@@ -72,31 +71,30 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <CustomText text="Code Beep에 오신 것을 환영합니다!" size={20} />
       <View>
-        <ImageBackground
-          source={require("../assets/code-beep-bubbles.png")}
-          style={styles.bubbles}
-        >
-          <View style={styles.bubblesBox}>
-            <CustomText text="자바스크립트 파일이" textColor="#000000" />
-            <CustomText text="있는 리포지토리가" textColor="#000000" />
-            <CustomText text="있어야 해요! >_" textColor="#000000" />
-          </View>
-        </ImageBackground>
         <Image
           source={require("../assets/code-beep-icon.png")}
           style={styles.icon}
         />
       </View>
-      <CustomButton
-        title="Github Login"
-        source={require("../assets/github-logo.png")}
-        onPress={() => promptAsync()}
-      />
+      <View style={styles.loginButtonWarpper}>
+        <TouchableOpacity style={styles.Button} onPress={() => promptAsync()}>
+          <View style={styles.buttonInnerBox}>
+            <Image
+              style={styles.buttonInnerLogo}
+              source={require("../assets/github-logo.png")}
+            />
+            <CustomText
+              text="Github 로그인하고 CODE BEEP 사용하기"
+              textColor="#000000"
+              size={14}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
       <CustomText
-        text="로그인 후 이용하실 수 있습니다"
-        size={14}
+        text="로그인 후 이용하 실 수 있습니다"
+        size={15}
         textColor="#808080"
       />
     </View>
@@ -117,16 +115,34 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 5,
   },
-  bubbles: {
-    flex: 0,
-    width: 150,
-    height: 150,
+  loginButtonWarpper: {
+    width: 300,
   },
-  bubblesBox: {
+  Button: {
+    padding: 10,
+    flex: 0,
+    width: "100%",
+    height: 55,
+    borderRadius: 50,
+    backgroundColor: "#ffffff",
+    gap: 10,
+  },
+  buttonInnerBox: {
     flex: 1,
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 7,
-    marginBottom: 20,
+    textAlign: "center",
+  },
+  buttonInnerLogo: {
+    flex: 1,
+    resizeMode: "center",
+    width: 30,
+    height: 30,
+  },
+  buttonInnerText: {
+    fontSize: 21,
   },
 });
