@@ -4,11 +4,13 @@
 
 ## 목차
 
-1. 작업 동기
-2. 개발 환경 및 도구
-3. 프리뷰
-4. 챌린지
-   1. 알람 시간을 어떻게 감지할 수 있을까?
+- [작업 동기](#작업-동기)
+- [개발 환경](#개발-환경)
+- [UI 미리보기](#ui-미리보기)
+- [문제 해결하기](#문제-해결하기)
+  - [1. 알람 시간을 어떻게 감지할 수 있을까](#1-알람-시간을-어떻게-감지할-수-있을까)
+    - [1-1. Foreground Service를 이용해 알람 시간 확인하기](#1-1-foreground-service를-이용해-알람-시간-확인하기)
+    - [1-2. Alarm Manager를 이용해 알람 예약하기](#1-2-alarm-manager를-이용해-알람-예약하기)
 
 ## 작업 동기
 
@@ -20,19 +22,23 @@
 
 ## 개발 환경
 
-![React Native](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Expo](https://img.shields.io/badge/expo-1C1E24?style=for-the-badge&logo=expo&logoColor=#D04A37) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
+![React Native](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![React](https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Expo](https://img.shields.io/badge/expo-1C1E24?style=for-the-badge&logo=expo&logoColor=#D04A37) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
 
-## 프리뷰
+## UI 미리보기
+
+![code beep ui preview](https://github.com/user-attachments/assets/44ecdc0d-cae2-4169-bf66-28dc8f8e519c)
+
+<div style="color:gray">1.로그인 화면 / 2-3.알람 리스트 화면 / 4-5.알람 등록 화면</div>
 
 ## 문제 해결하기
 
-### 1. 알람 시간을 어떻게 감지할 수 있을까?
+### 1. 알람 시간을 어떻게 감지할 수 있을까
 
 제 앱에 주목적은 사용자 원하는 시간에 알람을 울려 주는 것입니다. 사용자가 등록한 시간에 이벤트를 실행하기 위해서는 앱의 상태와 상관없이 디바이스가 등록된 시간을 인지하고 있어야 합니다.
 
 #### 1-1. Foreground Service를 이용해 알람 시간 확인하기
 
-가장 처음 시도한 방법은 안드로이드 API인 [Foreground Service](https://developer.android.com/develop/background-work/services/fgs?hl=ko)를 이용하는 것입니다. 앱이 꺼져 있더라도 백그라운드에서 시간을 계속 검사해야 한다고 생각했습니다. Foreground Service API는 앱이 백그라운드에 가거나, 종료되었을 때의 작업을 설정할 수 있습니다.
+가장 처음 시도한 방법은 안드로이드 API인 [Foreground Service API](https://developer.android.com/develop/background-work/services/fgs?hl=ko)를 이용하는 것입니다. 앱이 꺼져 있더라도 백그라운드에서 시간을 계속 검사해야 한다고 생각했습니다. Foreground Service API는 앱이 백그라운드에 가거나, 종료되었을 때의 작업을 설정할 수 있습니다.
 
 리액트 네이티브에서는 Foreground Service를 활용할 수 있도록 여러 라이브러리를 제공합니다. `react-native-background-action`과 `react-native-background-fetch` 중 `react-native-background-action`을 사용하게 되었습니다. `react-native-background-fetch`는 15분 단위로 백그라운드 요청을 보내는 제한이 있지만, `react-native-background-action`은 이러한 시간제한 없이 작업을 실행할 수 있었기 때문입니다.
 
@@ -108,7 +114,7 @@ while (true) {
 
 #### 1-2. Alarm Manager를 이용해 알람 예약하기
 
-이를 해결하기 위해 Alarm Manager API를 사용하여 사용자가 등록한 알람 시간에 이벤트를 예약하는 방식이 적합하다고 판단했습니다. Alarm Manager는 시스템 알람 서비스에 대한 접근 권한을 제공하여 특정 시간에 애플리케이션을 실행하도록 예약할 수 있습니다.
+이를 해결하기 위해 [Alarm Manager API](https://developer.android.com/develop/background-work/services/alarms/schedule?hl=ko)를 사용하여 사용자가 등록한 알람 시간에 이벤트를 예약하는 방식이 적합하다고 판단했습니다. Alarm Manager는 시스템 알람 서비스에 대한 접근 권한을 제공하여 특정 시간에 애플리케이션을 실행하도록 예약할 수 있습니다.
 
 이벤트를 예약하는 방식이기 때문에 백그라운드에서 시간을 계속 확인하지 않아도 됩니다. 이를 통해 백그라운드 스레드가 메인 스레드에 영향을 주지 않아 ANR 에러를 방지할 수 있습니다. Alarm Manager에서는 Doze 모드를 피할 수 있습니다. 또한 `setAlarmClock()` 및 `setExactAndAllowWhileIdle()` 메서드를 사용할 때 Doze 모드에서도 예외적으로 작업을 수행할 수 있도록 시스템에서 허용합니다.
 
