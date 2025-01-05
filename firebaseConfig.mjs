@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { get, getDatabase, ref, set } from "firebase/database";
-import { convertingNumberDay } from "./utils/convertingDay";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -31,18 +30,7 @@ if (getApps().length === 0) {
 
 async function saveAlarmData(userId, data) {
   const { selectedTime, selectedDays, selectedTitle } = data;
-  let dayNumber = "";
-
-  selectedDays.forEach((day) => {
-    const dayValue = convertingNumberDay(day);
-
-    dayNumber += dayValue;
-  });
-
-  const alarmId =
-    data &&
-    `${selectedTime.toTimeString().slice(0, 8)}${dayNumber}${selectedTitle}`;
-  const alarmRef = ref(database, `${userId}/${alarmId}`);
+  const alarmRef = ref(database, `${userId}/alarm/${selectedTime}`);
 
   await set(alarmRef, {
     selectedTime: `${selectedTime}`,
@@ -52,11 +40,11 @@ async function saveAlarmData(userId, data) {
 }
 
 async function getAlarmData(userId) {
-  const alarmRef = ref(database, `${userId}/`);
+  const alarmRef = ref(database, `${userId}/alarm/`);
   const snapshot = await get(alarmRef);
   const data = snapshot.val();
 
   return data;
 }
 
-export { app, auth, database, saveAlarmData, getAlarmData };
+export { app, auth, database, getAlarmData, saveAlarmData };
