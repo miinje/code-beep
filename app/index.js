@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
 import { router } from "expo-router";
 import * as SystemUI from "expo-system-ui";
@@ -10,12 +11,12 @@ import {
 import { useEffect } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../components/CustomText";
-import { auth, getAlarmData } from "../firebaseConfig.mjs";
+import { auth, getAlarmData, saveReposCodeData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
+import { getCodeFiles, getGithubUser } from "../utils/api";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getGithubUser } from "../utils/api";
+import { fetchRecentRepo } from "../utils/api";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
@@ -29,7 +30,7 @@ const discovery = {
 
 export default function App() {
   const { setAllAlarmData } = alarmStore();
-  const { setUserToken, setUserId } = userStore();
+  const { userRepoCode, setUserToken, setUserId } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -44,17 +45,7 @@ export default function App() {
       const { code } = response.params;
       const { access_token } = await createTokenWithCode(code);
 
-      if (!access_token) return;
-
-      const { login } = await getGithubUser(access_token);
-
-      if (access_token && login) {
-        await AsyncStorage.setItem("github_access_token", access_token);
-        await AsyncStorage.setItem("github_login_user", login);
-      }
-
-      setUserToken(access_token);
-      setUserId(login);
+      if (!access_token) console.error();
 
       const credential = GithubAuthProvider.credential(access_token);
       await signInWithCredential(auth, credential);
@@ -81,6 +72,15 @@ export default function App() {
 
         setUserToken(accessToken);
         setUserId(login);
+
+        try {
+          const repoName = await fetchRecentRepo(accessToken, login);
+          const files = await getCodeFiles(accessToken, login, repoName);
+
+          saveReposCodeData(user.uid, repoName, files);
+        } catch (error) {
+          console.error("파일 가져오기 실패:", error);
+        }
 
         setAllAlarmData(await getAlarmData(user.uid));
 

@@ -47,4 +47,10 @@ async function getAlarmData(userId) {
   return data;
 }
 
-export { app, auth, database, getAlarmData, saveAlarmData };
+async function saveReposCodeData(userId, repoName, data) {
+  const repoCodeRef = ref(database, `${userId}/code/${repoName}`);
+
+  await set(repoCodeRef, data);
+}
+
+export { app, auth, database, getAlarmData, saveAlarmData, saveReposCodeData };
