@@ -30,7 +30,7 @@ const discovery = {
 
 export default function App() {
   const { setAllAlarmData } = alarmStore();
-  const { setUserUid, setUserToken, setUserId } = userStore();
+  const { setUserUid } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -50,11 +50,15 @@ export default function App() {
       const credential = GithubAuthProvider.credential(access_token);
       await signInWithCredential(auth, credential);
 
-      onAuthStateChanged(auth, async (user) => {
-        const allAlarmData = await getAlarmData(user.uid);
+      try {
+        onAuthStateChanged(auth, async (user) => {
+          const allAlarmData = await getAlarmData(user.uid);
 
-        setAllAlarmData(allAlarmData[user.uid]);
-      });
+          setAllAlarmData(allAlarmData[user.uid]);
+        });
+      } catch (error) {
+        console.error(error);
+      }
 
       router.replace("/AlarmList");
     }
@@ -70,8 +74,6 @@ export default function App() {
         const accessToken = await AsyncStorage.getItem("github_access_token");
         const { login } = await getGithubUser(accessToken);
 
-        setUserToken(accessToken);
-        setUserId(login);
         setUserUid(user.uid);
 
         try {
