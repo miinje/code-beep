@@ -12,7 +12,10 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../components/CustomText";
 import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
+import userStore from "../store/userStore";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getGithubUser } from "../utils/api";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
@@ -24,8 +27,9 @@ const discovery = {
   revocationEndpoint: `https://github.com/settings/connections/applications/${process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID}`,
 };
 
-export default function Login() {
+export default function App() {
   const { setAllAlarmData } = alarmStore();
+  const { setUserToken, setUserId } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -35,16 +39,22 @@ export default function Login() {
     discovery
   );
 
-  useEffect(() => {
-    handleResponse();
-  }, [response]);
-
   async function handleResponse() {
     if (response.type === "success") {
       const { code } = response.params;
       const { access_token } = await createTokenWithCode(code);
 
       if (!access_token) return;
+
+      const { login } = await getGithubUser(access_token);
+
+      if (access_token && login) {
+        await AsyncStorage.setItem("github_access_token", access_token);
+        await AsyncStorage.setItem("github_login_user", login);
+      }
+
+      setUserToken(access_token);
+      setUserId(login);
 
       const credential = GithubAuthProvider.credential(access_token);
       await signInWithCredential(auth, credential);
@@ -60,14 +70,24 @@ export default function Login() {
   }
 
   useEffect(() => {
+    handleResponse();
+  }, [response]);
+
+  useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        const accessToken = await AsyncStorage.getItem("github_access_token");
+        const { login } = await getGithubUser(accessToken);
+
+        setUserToken(accessToken);
+        setUserId(login);
+
         setAllAlarmData(await getAlarmData(user.uid));
 
         router.replace("/AlarmList");
       }
     });
-  });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -78,7 +98,7 @@ export default function Login() {
         />
       </View>
       <View style={styles.loginButtonWarpper}>
-        <TouchableOpacity style={styles.Button} onPress={() => promptAsync()}>
+        <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
           <View style={styles.buttonInnerBox}>
             <Image
               style={styles.buttonInnerLogo}
@@ -118,7 +138,7 @@ const styles = StyleSheet.create({
   loginButtonWarpper: {
     width: 300,
   },
-  Button: {
+  button: {
     padding: 10,
     flex: 0,
     width: "100%",
