@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-import CustomButton from "../components/Custombutton";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
 import { stopAudio } from "../utils/audioPlayer";
@@ -19,9 +18,11 @@ export default function ActionAlarm() {
   };
 
   useEffect(() => {
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
+
+    return () => clearInterval(intervalId);
   });
 
   return (
@@ -57,9 +58,11 @@ export default function ActionAlarm() {
         </View>
         <CustomText text="일어날 시간이에요!" size={15} />
       </View>
-      <View style={styles.buttonBox}>
-        <CustomButton title="완료!" onPress={handleClickDone} />
-      </View>
+      <TouchableOpacity style={styles.button} onPress={handleClickDone}>
+        <View style={styles.buttonInnerBox}>
+          <CustomText text="완료!" textColor="#000000" size={21} />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -88,10 +91,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonBox: {
-    flex: 2,
+  button: {
+    flex: 0,
+    width: "85%",
+    marginBottom: "10%",
+    height: 55,
+    borderRadius: 50,
+    backgroundColor: "#ffffff",
+  },
+  buttonInnerBox: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
-    marginBottom: 40,
+    justifyContent: "center",
+    textAlign: "center",
   },
 });
