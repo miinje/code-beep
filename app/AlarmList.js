@@ -1,10 +1,12 @@
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
+import { getReposCodeData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
-import Header from "./components/Header";
+import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
-import { router } from "expo-router";
+import Header from "./components/Header";
 
 export default function AlarmList() {
   const {
@@ -15,6 +17,19 @@ export default function AlarmList() {
     setCurrentTime,
   } = alarmStore();
   const [isIncludedDay, setIncludedDay] = useState(false);
+  const { userUid, userRepoCodeData, setUserRepoCodeData } = userStore();
+
+  useEffect(() => {
+    if (Object.keys(userRepoCodeData).length === 0) {
+      const getCodeData = async () => {
+        const codeData = await getReposCodeData(userUid);
+
+        setUserRepoCodeData(codeData);
+      };
+
+      getCodeData();
+    }
+  }, []);
 
   useEffect(() => {
     const currentDay = convertingStringDay(new Date().getDay());

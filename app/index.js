@@ -30,7 +30,7 @@ const discovery = {
 
 export default function App() {
   const { setAllAlarmData } = alarmStore();
-  const { userRepoCode, setUserToken, setUserId } = userStore();
+  const { setUserUid, setUserToken, setUserId } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -72,6 +72,7 @@ export default function App() {
 
         setUserToken(accessToken);
         setUserId(login);
+        setUserUid(user.uid);
 
         try {
           const repoName = await fetchRecentRepo(accessToken, login);
