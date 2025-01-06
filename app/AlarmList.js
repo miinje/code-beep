@@ -20,7 +20,7 @@ export default function AlarmList() {
   const { userUid, userRepoCodeData, setUserRepoCodeData } = userStore();
 
   useEffect(() => {
-    if (Object.keys(userRepoCodeData).length === 0) {
+    if (userRepoCodeData) {
       const getCodeData = async () => {
         const codeData = await getReposCodeData(userUid);
 

@@ -19,8 +19,6 @@ export async function fetchRecentRepo(userToken, userName) {
     const repos = await response.json();
     if (repos.length > 0) {
       return repos[0].name;
-    } else {
-      console.log("리포지토리가 없습니다.");
     }
   } catch (error) {
     console.error("에러 발생:", error);
@@ -35,7 +33,7 @@ async function fetchFilesRecursive(
   depth = 0,
   maxDepth = 3
 ) {
-  if (depth > maxDepth) return []; // 최대 탐색 깊이 초과 시 종료
+  if (depth > maxDepth) return [];
 
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const HEADERS = {
