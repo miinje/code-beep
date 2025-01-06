@@ -3,5 +3,5 @@ export default function onScroll(event, time, setFunction) {
   const ITEM_HEIGHT = 40;
   const index = Math.round(offsetY / ITEM_HEIGHT);
 
-  setFunction(time[index % time.length]);
+  setFunction(time[index]);
 }

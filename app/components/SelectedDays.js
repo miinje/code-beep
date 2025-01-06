@@ -4,6 +4,7 @@ import {
   convertingNumberDay,
   convertingStringDay,
 } from "../../utils/convertingDay";
+import React from "react";
 
 export default function SelectedDays({
   isOpenDayModal,
@@ -34,22 +35,28 @@ export default function SelectedDays({
     const isSelected = selectedDays.includes(day);
 
     return (
-      <TouchableOpacity
-        style={{
-          width: 300,
-          flex: 0,
-          flexDirection: "row",
-          padding: 10,
-          borderBottomColor: "#6e6f6f",
-          borderBottomWidth: 1,
-          justifyContent: "space-between",
-        }}
-        key={day}
-        onPress={() => handleSelectedDay(day)}
-      >
-        <CustomText text={day} size={15} />
-        {isSelected && <Text>✅</Text>}
-      </TouchableOpacity>
+      <React.Fragment key={day}>
+        <TouchableOpacity
+          style={{
+            width: 300,
+            flex: 0,
+            flexDirection: "row",
+            padding: 10,
+            justifyContent: "space-between",
+          }}
+          onPress={() => handleSelectedDay(day)}
+        >
+          <CustomText text={`${day}요일`} size={15} />
+          {isSelected && <Text style={styles.checkIcon}>✓</Text>}
+        </TouchableOpacity>
+        <View
+          style={{
+            width: 300,
+            borderBottomColor: "#6e6f6f",
+            borderBottomWidth: 1,
+          }}
+        ></View>
+      </React.Fragment>
     );
   });
 
@@ -68,7 +75,7 @@ export default function SelectedDays({
           <CustomText text="요일 선택" size={20} />
           <View>{daysItem}</View>
           <TouchableOpacity
-            style={[styles.button, styles.buttonClose]}
+            style={styles.button}
             onPress={() => {
               setIsOpenDayModal(false);
             }}
@@ -85,6 +92,7 @@ const styles = StyleSheet.create({
   modal: {
     width: 200,
     height: 200,
+    zIndex: 20,
   },
   centeredView: {
     flex: 1,
@@ -111,9 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    marginTop: 20,
-  },
-  buttonClose: {
+    marginTop: 30,
     backgroundColor: "#ffffff",
   },
   textStyle: {
@@ -124,5 +130,8 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+  checkIcon: {
+    color: "#0fff00",
   },
 });

@@ -78,7 +78,7 @@ export default function AddAlarm() {
   }, [saveAlarm]);
 
   const selecteDaysList = selectedDays.map((day) => {
-    return <CustomText key={day} text={day} size={12} textColor="#C0C0C0" />;
+    return <CustomText key={day} text={day} size={14} textColor="#ffffff" />;
   });
 
   return (
@@ -91,7 +91,7 @@ export default function AddAlarm() {
           <ScrollView
             ref={amPmScrollView}
             snapToInterval={ITEM_HEIGHT}
-            decelerationRate="fast"
+            decelerationRate="normal"
             showsVerticalScrollIndicator={false}
             onScroll={(event) => onScroll(event, amPm, setSelectedAmPm)}
             contentOffset={{
@@ -130,7 +130,7 @@ export default function AddAlarm() {
               <View key={index} style={styles.item}>
                 <CustomText
                   text={String(hour).padStart(2, "0")}
-                  size={24}
+                  size={25}
                   textColor={hour === selectedHours ? "#ffffff" : "#B0B0B0"}
                 />
               </View>
@@ -139,17 +139,19 @@ export default function AddAlarm() {
           </ScrollView>
         </View>
 
-        <CustomText text=":" size={40} />
+        <View style={styles.timeStamp}>
+          <CustomText text=":" size={35} />
+        </View>
 
         <View style={styles.picker}>
           <ScrollView
             ref={minuteScrollView}
             snapToInterval={ITEM_HEIGHT}
-            decelerationRate="fast"
+            decelerationRate="normal"
             showsVerticalScrollIndicator={false}
             onScroll={(event) => onScroll(event, minutes, setSelectedMinutes)}
             contentOffset={{
-              y: selectedMinutes * ITEM_HEIGHT,
+              y: minutes.indexOf(selectedMinutes) * ITEM_HEIGHT,
             }}
           >
             <View style={{ height: ITEM_HEIGHT * 2 }} />
@@ -157,7 +159,7 @@ export default function AddAlarm() {
               <View key={index} style={styles.item}>
                 <CustomText
                   text={String(minute).padStart(2, "0")}
-                  size={24}
+                  size={25}
                   textColor={minute === selectedMinutes ? "#ffffff" : "#B0B0B0"}
                 />
               </View>
@@ -170,7 +172,7 @@ export default function AddAlarm() {
       <View style={styles.buttonContainer}>
         <View style={styles.buttonBox}>
           <TouchableOpacity style={styles.button} onPress={clickhandleDayModal}>
-            <CustomText text="요일" size={17} />
+            <CustomText text="요일" size={13} />
             <View
               style={{
                 position: "absolute",
@@ -182,11 +184,11 @@ export default function AddAlarm() {
             >
               {selecteDaysList}
             </View>
-            <CustomText text=">" size={17} />
+            <CustomText text=">" size={13} />
           </TouchableOpacity>
           <View style={styles.buttonBorder}></View>
           <View style={styles.button} pointerEvents="auto">
-            <CustomText text="제목" size={17} />
+            <CustomText text="이름" size={13} />
             <TextInput
               value={selectedTitle}
               onChangeText={setSelectedTitle}
@@ -196,6 +198,7 @@ export default function AddAlarm() {
                 flex: 0,
                 justifyContent: "flex-end",
                 textAlign: "right",
+                fontSize: 14,
               }}
             />
           </View>
@@ -233,13 +236,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     marginTop: 20,
-    borderBottomColor: "#ffffff",
-    borderBottomWidth: 1,
   },
   pickerContainer: {
+    width: 300,
+    padding: 15,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 30,
+    borderBottomColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderTopColor: "#ffffff",
+    borderTopWidth: 1,
   },
   picker: {
     height: 200,
@@ -256,6 +263,11 @@ const styles = StyleSheet.create({
   },
   item: {
     height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  timeStamp: {
+    marginBottom: 7,
     justifyContent: "center",
     alignItems: "center",
   },
