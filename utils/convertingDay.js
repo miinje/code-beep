@@ -1,65 +1,45 @@
 export function convertingNumberDay(day) {
-  let dayValue = "";
+  const dayToNumberMap = {
+    월: 1,
+    화: 2,
+    수: 3,
+    목: 4,
+    금: 5,
+    토: 6,
+    일: 0,
+  };
 
-  switch (day) {
-    case "월":
-      dayValue = 1;
-      break;
-    case "화":
-      dayValue = 2;
-      break;
-    case "수":
-      dayValue = 3;
-      break;
-    case "목":
-      dayValue = 4;
-      break;
-    case "금":
-      dayValue = 5;
-      break;
-    case "토":
-      dayValue = 6;
-      break;
-    case "일":
-      dayValue = 0;
-      break;
-    default:
-      dayValue = day;
-      break;
-  }
-
-  return dayValue;
+  return dayToNumberMap[day];
 }
 
 export function convertingStringDay(day) {
-  let dayValue = "";
+  const numberToDayMap = {
+    1: "월",
+    2: "화",
+    3: "수",
+    4: "목",
+    5: "금",
+    6: "토",
+    0: "일",
+  };
 
-  switch (day) {
-    case 1:
-      dayValue = "월";
-      break;
-    case 2:
-      dayValue = "화";
-      break;
-    case 3:
-      dayValue = "수";
-      break;
-    case 4:
-      dayValue = "목";
-      break;
-    case 5:
-      dayValue = "금";
-      break;
-    case 6:
-      dayValue = "토";
-      break;
-    case 0:
-      dayValue = "일";
-      break;
-    default:
-      dayValue = day;
-      break;
-  }
+  return numberToDayMap[day];
+}
 
-  return dayValue;
+export function convertingDay(day) {
+  const dayToNumberMap = {
+    월: 1,
+    화: 2,
+    수: 3,
+    목: 4,
+    금: 5,
+    토: 6,
+    일: 0,
+  };
+
+  const numberToDayMap = Object.fromEntries(
+    Object.entries(dayMap).map(([key, value]) => [value, key])
+  );
+
+  return dayToNumberMap[day] ?? numberToDayMap[day];
 }
