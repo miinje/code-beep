@@ -47,6 +47,8 @@ export default function App() {
 
       if (!access_token) console.error();
 
+      await AsyncStorage.setItem("github_access_token", access_token);
+
       const credential = GithubAuthProvider.credential(access_token);
       await signInWithCredential(auth, credential);
 
@@ -84,7 +86,7 @@ export default function App() {
           Object.keys(files).map((key) => {
             const codeData = files[key];
 
-            if (codeData.path.slice(-3) === ".js") {
+            if (files && codeData.path.slice(-3) === ".js") {
               return (repoFilesData[key] = codeData);
             }
           });
