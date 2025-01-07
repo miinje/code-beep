@@ -8,6 +8,7 @@ import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
 import Header from "./components/Header";
+import { fetchFileContent } from "../utils/api";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
@@ -18,9 +19,28 @@ export default function AlarmList() {
     currentTime,
     setIsTimeMatched,
     setCurrentTime,
+    setAlarmQuiz,
   } = alarmStore();
   const [isIncludedDay, setIncludedDay] = useState(false);
   const { userUid, userRepoCodeData, setUserRepoCodeData } = userStore();
+
+  useEffect(() => {
+    if (userRepoCodeData) {
+      Object.keys(userRepoCodeData).map((repoName) => {
+        const repoFiles = userRepoCodeData[repoName];
+
+        repoFiles.map(async (data) => {
+          const path = data.path;
+
+          if (path === "utils/convertingDay.js") {
+            const codeString = await fetchFileContent(data.download_url);
+
+            return setAlarmQuiz(codeString);
+          }
+        });
+      });
+    }
+  }, [userRepoCodeData]);
 
   useEffect(() => {
     if (userRepoCodeData) {

@@ -91,3 +91,19 @@ export async function getCodeFiles(accessToken, userName, repo) {
 
   return filesWithCode;
 }
+
+export async function fetchFileContent(fileUrl) {
+  try {
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const fileContent = await response.text();
+
+    return fileContent;
+  } catch (error) {
+    console.error("파일 가져오기 실패:", error);
+  }
+}
