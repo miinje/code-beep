@@ -1,16 +1,13 @@
 import { router } from "expo-router";
-import * as SystemUI from "expo-system-ui";
 import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
 import { getReposCodeData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
+import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
 import Header from "./components/Header";
-import { fetchFileContent } from "../utils/api";
-
-SystemUI.setBackgroundColorAsync("#404040");
 
 export default function AlarmList() {
   const {
@@ -94,8 +91,6 @@ export default function AlarmList() {
           convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
           currentTime.getSeconds() === 0
         ) {
-          console.log("Match");
-
           setIsTimeMatched(true);
         }
       }
@@ -171,7 +166,9 @@ export default function AlarmList() {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <View style={styles.headerContainer}>
+        <Header />
+      </View>
       <View style={styles.alarmListBox}>
         {allAlarmData ? (
           <>
@@ -202,8 +199,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#404040",
-    margin: 40,
     gap: 2,
+  },
+  headerContainer: {
+    marginTop: 20,
+    marginLeft: 40,
+    marginRight: 40,
   },
   alarmListBox: {
     width: 340,
