@@ -1,11 +1,21 @@
 export async function getGithubUser(token) {
-  const githubUser = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const githubUser = await fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  return githubUser.json();
+    if (!githubUser.ok) {
+      throw new Error(`HTTP Error! Status: ${githubUser.status}`);
+    }
+
+    return await githubUser.json();
+  } catch (error) {
+    console.error("GitHub 사용자 정보 가져오기 실패:", error);
+
+    return undefined;
+  }
 }
 
 export async function fetchRecentRepo(userToken, userName) {
@@ -41,11 +51,11 @@ async function fetchFilesRecursive(
     "Content-Type": "application/json",
   };
 
-  if (visitedPaths.has(path)) {
-    return [];
-  }
+  // if (visitedPaths.has(path)) {
+  //   return [];
+  // }
 
-  visitedPaths.add(path);
+  // visitedPaths.add(path);
 
   const response = await fetch(url, { headers: HEADERS });
   const files = await response.json();
