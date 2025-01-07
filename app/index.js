@@ -29,7 +29,7 @@ const discovery = {
 };
 
 export default function App() {
-  const { setAllAlarmData } = alarmStore();
+  const { allAlarmData, setAllAlarmData } = alarmStore();
   const { setUserUid } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -69,6 +69,10 @@ export default function App() {
   }, [response]);
 
   useEffect(() => {
+    if (!allAlarmData) {
+      return;
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const accessToken = await AsyncStorage.getItem("github_access_token");
@@ -79,8 +83,17 @@ export default function App() {
         try {
           const repoName = await fetchRecentRepo(accessToken, login);
           const files = await getCodeFiles(accessToken, login, repoName);
+          const repoFilesData = {};
 
-          saveReposCodeData(user.uid, repoName, files);
+          Object.keys(files).map((key) => {
+            const codeData = files[key];
+
+            if (codeData.path.slice(-3) === ".js") {
+              return (repoFilesData[key] = codeData);
+            }
+          });
+
+          saveReposCodeData(user.uid, repoName, repoFilesData);
         } catch (error) {
           console.error("파일 가져오기 실패:", error);
         }
@@ -90,7 +103,7 @@ export default function App() {
         router.replace("/AlarmList");
       }
     });
-  }, []);
+  }, [allAlarmData]);
 
   return (
     <View style={styles.container}>
