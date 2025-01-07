@@ -51,11 +51,11 @@ async function fetchFilesRecursive(
     "Content-Type": "application/json",
   };
 
-  // if (visitedPaths.has(path)) {
-  //   return [];
-  // }
+  if (visitedPaths.has(path)) {
+    return [];
+  }
 
-  // visitedPaths.add(path);
+  visitedPaths.add(path);
 
   const response = await fetch(url, { headers: HEADERS });
   const files = await response.json();

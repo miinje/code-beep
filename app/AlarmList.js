@@ -67,20 +67,24 @@ export default function AlarmList() {
       const { selectedDays } = allAlarmData[data];
       const convertedDays = [...selectedDays].filter((value) => value !== ",");
 
-      if (convertedDays.includes(convertingStringDay(currentDay))) {
+      if (String(convertedDays).includes(currentDay)) {
         setIncludedDay(true);
       }
     }
   }, [allAlarmData]);
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = new Date();
+
+      setCurrentTime(now);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     if (isIncludedDay) {
-      const intervalId = setInterval(() => {
-        const now = new Date();
-
-        setCurrentTime(now);
-      }, 1000);
-
       for (const data in allAlarmData) {
         const { selectedTime } = allAlarmData[data];
         const convertedSelectedTime = new Date(selectedTime);
@@ -90,13 +94,13 @@ export default function AlarmList() {
           convertedSelectedTime.getMinutes() === currentTime.getMinutes() &&
           currentTime.getSeconds() === 0
         ) {
+          console.log("Match");
+
           setIsTimeMatched(true);
         }
       }
-
-      return () => clearInterval(intervalId);
     }
-  });
+  }, [currentTime, allAlarmData, isIncludedDay]);
 
   useEffect(() => {
     if (isTimeMatched) {
