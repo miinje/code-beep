@@ -69,10 +69,6 @@ export default function App() {
   }, [response]);
 
   useEffect(() => {
-    if (!allAlarmData) {
-      return;
-    }
-
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const accessToken = await AsyncStorage.getItem("github_access_token");
