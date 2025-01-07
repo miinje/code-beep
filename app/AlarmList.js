@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import * as SystemUI from "expo-system-ui";
 import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CustomText from "../components/CustomText";
@@ -7,6 +8,8 @@ import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
 import Header from "./components/Header";
+
+SystemUI.setBackgroundColorAsync("#404040");
 
 export default function AlarmList() {
   const {
@@ -23,8 +26,14 @@ export default function AlarmList() {
     if (userRepoCodeData) {
       const getCodeData = async () => {
         const codeData = await getReposCodeData(userUid);
+        const newCodeData = {};
+        Object.keys(codeData).map((key) => {
+          const newCodeDataArray = codeData[key].filter((data) => data);
 
-        setUserRepoCodeData(codeData);
+          return (newCodeData[key] = newCodeDataArray);
+        });
+
+        setUserRepoCodeData(newCodeData);
       };
 
       getCodeData();
