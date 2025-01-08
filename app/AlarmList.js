@@ -7,6 +7,7 @@ import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
+import { makeQuizFunction } from "../utils/makeQuizFunction";
 import Header from "./components/Header";
 
 export default function AlarmList() {
@@ -31,8 +32,9 @@ export default function AlarmList() {
 
           if (path === "utils/convertingDay.js") {
             const codeString = await fetchFileContent(data.download_url);
+            const funcQuiz = makeQuizFunction(codeString);
 
-            return setAlarmQuiz(codeString);
+            setAlarmQuiz(funcQuiz);
           }
         });
       });
