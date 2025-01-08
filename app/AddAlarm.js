@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import CustomButton from "../components/Custombutton";
 import CustomText from "../components/CustomText";
-import { auth, saveAlarmData } from "../firebaseConfig.mjs";
+import { auth, getAlarmData, saveAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { convertingStringDay } from "../utils/convertingDay";
-import SelectedDays from "./components/SelectedDays";
 import onScroll from "../utils/onScroll";
+import SelectedDays from "./components/SelectedDays";
 
 export default function AddAlarm() {
-  const { allAlarmData, setAllAlarmData } = alarmStore();
+  const { setAllAlarmData } = alarmStore();
   const [selectedHours, setSelectedHours] = useState(new Date().getHours());
   const [selectedMinutes, setSelectedMinutes] = useState(
     new Date().getMinutes()
@@ -69,9 +69,11 @@ export default function AddAlarm() {
     if (saveAlarm) {
       onAuthStateChanged(auth, async (user) => {
         saveAlarmData(user.uid, saveAlarm);
-      });
 
-      setAllAlarmData({ ...allAlarmData, saveAlarm });
+        const getAllalarmData = await getAlarmData(user.uid);
+
+        setAllAlarmData(getAllalarmData);
+      });
 
       router.replace("/AlarmList");
     }
@@ -222,6 +224,7 @@ export default function AddAlarm() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#404040",
     width: "100%",
     flex: 1,
     justifyContent: "top",
