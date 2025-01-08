@@ -32,7 +32,7 @@ export default function AlarmList() {
 
           if (path === "utils/convertingDay.js") {
             const codeString = await fetchFileContent(data.download_url);
-            const funcQuiz = makeQuizFunction(codeString);
+            const funcQuiz = makeQuizFunction(codeString, data.path);
 
             setAlarmQuiz(funcQuiz);
           }
@@ -46,10 +46,11 @@ export default function AlarmList() {
       const getCodeData = async () => {
         const codeData = await getReposCodeData(userUid);
         const newCodeData = {};
+
         Object.keys(codeData).map((key) => {
           const newCodeDataArray = codeData[key].filter((data) => data);
 
-          return (newCodeData[key] = newCodeDataArray);
+          newCodeData[key] = newCodeDataArray;
         });
 
         setUserRepoCodeData(newCodeData);

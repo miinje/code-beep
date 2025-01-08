@@ -1,4 +1,4 @@
-export function makeQuizFunction(code) {
+export function makeQuizFunction(code, filesRoot) {
   const lines = code.split("\n");
   const functionsDetails = [];
   let functionBody = [];
@@ -51,7 +51,8 @@ export function makeQuizFunction(code) {
 
       if (braceCount === 0) {
         functionsDetails.push({
-          functionBody: functionBody.join("\n"),
+          filesRoot: filesRoot,
+          functionBody: functionBody,
           returnValues: returnValues,
         });
 
