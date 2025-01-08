@@ -64,7 +64,7 @@ export default function AlarmList() {
       const { selectedDays } = allAlarmData[data];
       const convertedDays = [...selectedDays].filter((value) => value !== ",");
 
-      if (String(convertedDays).includes(currentDay)) {
+      if (convertedDays.includes(currentDay)) {
         setIncludedDay(true);
       }
     }
