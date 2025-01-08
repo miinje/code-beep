@@ -39,6 +39,7 @@ async function fetchFilesRecursive(
   accessToken,
   owner,
   repo,
+  visitedPaths,
   path = "",
   depth = 0,
   maxDepth = 3
@@ -54,7 +55,6 @@ async function fetchFilesRecursive(
   if (visitedPaths.has(path)) {
     return [];
   }
-
   visitedPaths.add(path);
 
   const response = await fetch(url, { headers: HEADERS });
@@ -71,6 +71,7 @@ async function fetchFilesRecursive(
           accessToken,
           owner,
           repo,
+          visitedPaths,
           file.path,
           depth + 1,
           maxDepth
@@ -87,7 +88,13 @@ async function fetchFilesRecursive(
 }
 
 export async function getCodeFiles(accessToken, userName, repo) {
-  const filesWithCode = await fetchFilesRecursive(accessToken, userName, repo);
+  const visitedPaths = new Set();
+  const filesWithCode = await fetchFilesRecursive(
+    accessToken,
+    userName,
+    repo,
+    visitedPaths
+  );
 
   return filesWithCode;
 }

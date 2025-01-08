@@ -56,7 +56,7 @@ export default function App() {
         onAuthStateChanged(auth, async (user) => {
           const allAlarmData = await getAlarmData(user.uid);
 
-          setAllAlarmData(allAlarmData[user.uid]);
+          setAllAlarmData(allAlarmData);
         });
       } catch (error) {
         console.error(error);
