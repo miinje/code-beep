@@ -55,7 +55,7 @@ export default function ActionAlarm() {
   const handleClickDone = async () => {
     Keyboard.dismiss();
 
-    if (inputValue !== "Hi") {
+    if (inputValue !== alarmQuiz[0].returnValues[0]) {
       setCheckResult("");
 
       Alert.alert("오답입니다!", "다시 생각해 보세요", [
@@ -83,7 +83,7 @@ export default function ActionAlarm() {
     }
   };
 
-  const alarmQuizItems = alarmQuiz[0].functionBody.map((text) => {
+  const alarmQuizItems = alarmQuiz[0].functionBody.map((text, index) => {
     const returnValue = alarmQuiz[0].returnValues[0];
     const returnBlankSpace = Array.from(returnValue)
       .map((text) => {
@@ -103,6 +103,7 @@ export default function ActionAlarm() {
 
     return (
       <CodeHighlighter
+        key={index}
         hljsStyle={atomOneDarkReasonable}
         containerStyle={{
           width: "100%",
@@ -112,7 +113,7 @@ export default function ActionAlarm() {
         textStyle={[
           styles.quizText,
           {
-            fontSize: text.includes("return") ? 13 : 14,
+            fontSize: text.includes("return") ? 12 : 13,
             width: text.includes("return") && 350,
             backgroundColor: text.includes("return") && "#2e5c90",
             padding: text.includes("return") && 2,
@@ -261,9 +262,9 @@ const styles = StyleSheet.create({
   quizTextBox: {
     minWidth: 370,
     maxWidth: 380,
-    minHeight: 350,
-    maxHeight: 370,
-    borderWidth: 3,
+    minHeight: 330,
+    maxHeight: 350,
+    borderWidth: 2,
     backgroundColor: "#282C35",
     padding: 20,
     borderRadius: 15,
