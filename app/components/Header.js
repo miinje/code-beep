@@ -27,7 +27,7 @@ export default function Header({ deletedAlarms, setDeletedAlarms }) {
               style: "cancel",
             },
             {
-              text: "확인",
+              text: "삭제",
               onPress: async () => {
                 setIsDeleteAlarm(true);
                 setIsActivateEdit(false);
@@ -46,7 +46,7 @@ export default function Header({ deletedAlarms, setDeletedAlarms }) {
           style={styles.editButton}
           onPress={handleClickEditButton}
         >
-          <CustomText size={20} text={!isActivateEdit ? "편집" : "삭제"} />
+          <CustomText size={25} text={!isActivateEdit ? "편집" : "삭제"} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
@@ -67,15 +67,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "top",
     pointerEvents: "auto",
+    marginTop: 10,
   },
   editButton: {
-    width: 40,
+    width: 50,
     height: 40,
   },
   addButton: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     textAlign: "auto",
     marginTop: -15,
+    marginRight: -15,
   },
 });
