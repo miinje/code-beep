@@ -83,11 +83,17 @@ export default function ActionAlarm() {
 
   const alarmQuizItems = alarmQuiz[0].functionBody.map((text) => {
     const returnValue = alarmQuiz[0].returnValues[0];
-    let returnBlankSpace = "";
+    const returnBlankSpace = [];
 
     if (text.includes(returnValue)) {
       text = text.slice(0, text.length - returnValue.length - 1);
-      returnBlankSpace = "".padEnd(returnValue.length, " ");
+      Array.from(returnValue).map((text) => {
+        if (text === "[" || text === "]") {
+          returnBlankSpace.push(text);
+        } else {
+          returnBlankSpace.push(" ");
+        }
+      });
     }
 
     return (
@@ -97,17 +103,33 @@ export default function ActionAlarm() {
       >
         <Text style={styles.quizText}>{text}</Text>
         {returnBlankSpace.length !== 0 ? (
-          <Text
+          <View
             style={{
-              backgroundColor: "#ffffff",
               height: 23,
               flex: 0,
               flexDirection: "row",
               PaddingBottom: 5,
+              gap: 5,
             }}
           >
-            {returnBlankSpace}
-          </Text>
+            {returnBlankSpace.map((blank, index) => {
+              const borderWidth = blank === " " ? 2 : 0;
+
+              return (
+                <Text
+                  key={index}
+                  style={{
+                    width: 7,
+                    borderBottomColor: "#ffffff",
+                    borderBottomWidth: borderWidth,
+                    color: "#ffffff",
+                  }}
+                >
+                  {blank}
+                </Text>
+              );
+            })}
+          </View>
         ) : null}
       </View>
     );
