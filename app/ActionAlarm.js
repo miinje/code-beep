@@ -14,6 +14,8 @@ import {
 import CustomText from "../components/CustomText";
 import alarmStore from "../store/alarmStore";
 import { stopAudio } from "../utils/audioPlayer";
+import CodeHighlighter from "react-native-code-highlighter";
+import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 export default function ActionAlarm() {
   const { currentTime, alarmQuiz, setCurrentTime, setIsTimeMatched } =
@@ -83,58 +85,44 @@ export default function ActionAlarm() {
 
   const alarmQuizItems = alarmQuiz[0].functionBody.map((text) => {
     const returnValue = alarmQuiz[0].returnValues[0];
-    const returnBlankSpace = [];
-
-    if (text.includes(returnValue)) {
-      text = text.slice(0, text.length - returnValue.length - 1);
-      Array.from(returnValue).map((text) => {
+    const returnBlankSpace = Array.from(returnValue)
+      .map((text) => {
         if (text === "[" || text === "]") {
-          returnBlankSpace.push(text);
+          return text;
         } else {
-          returnBlankSpace.push(" ");
+          return "_";
         }
-      });
-    }
+      })
+      .join(" ");
+
+    text = text.includes("return")
+      ? text.slice(0, text.length - returnValue.length - 1) +
+        " " +
+        returnBlankSpace
+      : text;
 
     return (
-      <View
-        key={text}
-        style={{ flex: 0, flexDirection: "row", width: "100%", gap: 10 }}
+      <CodeHighlighter
+        hljsStyle={atomOneDarkReasonable}
+        containerStyle={{
+          width: "100%",
+          height: "100%",
+          padding: 2,
+        }}
+        textStyle={[
+          styles.quizText,
+          {
+            fontSize: text.includes("return") ? 13 : 14,
+            width: text.includes("return") && 350,
+            backgroundColor: text.includes("return") && "#2e5c90",
+            padding: text.includes("return") && 2,
+            marginLeft: text.includes("return") && -2,
+          },
+        ]}
+        language="javascript"
       >
-        <Text style={styles.quizText}>{text}</Text>
-        {returnBlankSpace.length !== 0 ? (
-          <View
-            style={{
-              height: 23,
-              flex: 0,
-              flexDirection: "row",
-              marginTop: -5,
-              marginBottom: 5,
-              gap: 5,
-            }}
-          >
-            {returnBlankSpace.map((blank, index) => {
-              const borderWidth = blank === " " ? 1 : 0;
-
-              return (
-                <Text
-                  key={index}
-                  style={{
-                    width: 6,
-                    borderBottomColor: "#ffffff",
-                    borderBottomWidth: borderWidth,
-                    color: "#ffffff",
-                    fontSize: 10,
-                    textAlign: "center",
-                  }}
-                >
-                  {blank}
-                </Text>
-              );
-            })}
-          </View>
-        ) : null}
-      </View>
+        {text}
+      </CodeHighlighter>
     );
   });
 
@@ -195,9 +183,7 @@ export default function ActionAlarm() {
               <Text style={styles.rootText}>{alarmQuiz[0].filesRoot}</Text>
               <Text style={styles.rootText}>JavaScript</Text>
             </View>
-            <View style={{ flex: 0, gap: 3, marginTop: 10 }}>
-              {alarmQuizItems}
-            </View>
+            <View style={{ flex: 0, marginTop: 10 }}>{alarmQuizItems}</View>
           </View>
           <TextInput
             style={styles.textInput}
@@ -266,8 +252,6 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   fileRootText: {
-    minWidth: 350,
-    maxWidth: 370,
     flexDirection: "row",
     justifyContent: "space-between",
     marginLeft: -12,
@@ -280,19 +264,20 @@ const styles = StyleSheet.create({
     minHeight: 350,
     maxHeight: 370,
     borderWidth: 3,
-    backgroundColor: "#383838",
+    backgroundColor: "#282C35",
     padding: 20,
     borderRadius: 15,
   },
   rootText: {
+    minWidth: 300,
+    maxWidth: 320,
     fontFamily: "CONSOLA",
     color: "#C0C0C0",
-    fontSize: 9,
+    fontSize: 10,
   },
   quizText: {
     fontFamily: "CONSOLA",
     color: "#ffffff",
-    fontSize: 13,
   },
   textInput: {
     backgroundColor: "#ffffff",
