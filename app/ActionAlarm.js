@@ -251,7 +251,8 @@ const styles = StyleSheet.create({
   },
   quizTextBox: {
     width: 370,
-    height: 370,
+    minHeight: 340,
+    maxHeight: 370,
     borderWidth: 3,
     backgroundColor: "#383838",
     padding: 20,
