@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -20,7 +20,7 @@ export default function ActionAlarm() {
     alarmStore();
   const [inputValue, setInputValue] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const router = useRouter();
+  const [checkResult, setCheckResult] = useState(true);
   const [isFontsLoaded] = useFonts({
     CONSOLA: require("../assets/fonts/CONSOLA.ttf"),
   });
@@ -54,15 +54,30 @@ export default function ActionAlarm() {
     Keyboard.dismiss();
 
     if (inputValue !== "Hi") {
+      setCheckResult("");
+
       Alert.alert("오답입니다!", "다시 생각해 보세요", [
-        { text: "OK", onPress: () => setInputValue("") },
+        {
+          text: "OK",
+          onPress: () => {
+            setInputValue(false);
+            setCheckResult(false);
+          },
+        },
       ]);
     } else {
-      setIsTimeMatched(false);
-
       await stopAudio();
+      setCheckResult("");
 
-      router.replace("/AlarmList");
+      Alert.alert("정답입니다!", "", [
+        {
+          text: "OK",
+          onPress: () => {
+            router.replace("/AlarmList");
+            setIsTimeMatched(false);
+          },
+        },
+      ]);
     }
   };
 
@@ -84,10 +99,11 @@ export default function ActionAlarm() {
         {returnBlankSpace.length !== 0 ? (
           <Text
             style={{
-              backgroundColor: "#E0E0E0",
-              borderRadius: 5,
+              backgroundColor: "#ffffff",
+              height: 23,
               flex: 0,
               flexDirection: "row",
+              PaddingBottom: 5,
             }}
           >
             {returnBlankSpace}
@@ -137,7 +153,19 @@ export default function ActionAlarm() {
             { marginBottom: isKeyboardVisible ? 150 : 0 },
           ]}
         >
-          <View style={styles.quizTextBox}>
+          <View
+            style={[
+              styles.quizTextBox,
+              {
+                borderColor:
+                  checkResult === ""
+                    ? "#383838"
+                    : checkResult === true
+                      ? "#76ff0d"
+                      : "#ff0d0d",
+              },
+            ]}
+          >
             <View style={styles.fileRootText}>
               <Text style={styles.rootText}>{alarmQuiz[0].filesRoot}</Text>
               <Text style={styles.rootText}>JavaScript</Text>
@@ -150,8 +178,8 @@ export default function ActionAlarm() {
             style={styles.textInput}
             value={inputValue}
             onChangeText={setInputValue}
-            placeholder="빈칸에 옳은 답을 쓰시오"
-            placeholderTextColor="#000"
+            placeholder="위 코드 내 빈칸에 들어갈 알맞은 답을 쓰세요"
+            placeholderTextColor="#C0C0C0"
           />
         </View>
         {!isKeyboardVisible ? (
@@ -217,11 +245,14 @@ const styles = StyleSheet.create({
     width: 350,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginLeft: -10,
+    marginLeft: -15,
+    marginTop: -10,
+    marginBottom: 10,
   },
   quizTextBox: {
     width: 370,
-    height: 350,
+    height: 370,
+    borderWidth: 3,
     backgroundColor: "#383838",
     padding: 20,
     borderRadius: 15,
@@ -229,12 +260,12 @@ const styles = StyleSheet.create({
   rootText: {
     fontFamily: "CONSOLA",
     color: "#C0C0C0",
-    fontSize: 9,
+    fontSize: 10,
   },
   quizText: {
     fontFamily: "CONSOLA",
-    color: "#C0C0C0",
-    fontSize: 12,
+    color: "#ffffff",
+    fontSize: 13,
   },
   textInput: {
     backgroundColor: "#ffffff",
@@ -243,6 +274,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 50,
     borderRadius: 10,
+    fontSize: 13,
   },
   buttonInnerBox: {
     flex: 1,
