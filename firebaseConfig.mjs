@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
-import { get, getDatabase, ref, set } from "firebase/database";
+import { get, getDatabase, ref, remove, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -26,6 +26,10 @@ if (getApps().length === 0) {
   database = getDatabase(app);
 } else {
   app = getApp();
+  database = getDatabase(app);
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
 }
 
 async function saveAlarmData(userId, data) {
@@ -47,6 +51,16 @@ async function getAlarmData(userId) {
   return data;
 }
 
+async function deleteAlarmData(userId, dataId) {
+  try {
+    const deleteAlarmRef = ref(database, `${userId}/alarm/${dataId}`);
+
+    await remove(deleteAlarmRef);
+  } catch (error) {
+    console.error("삭제 실패:", error);
+  }
+}
+
 async function saveReposCodeData(userId, repoName, data) {
   const repoCodeRef = ref(database, `${userId}/code/${repoName}`);
 
@@ -65,8 +79,9 @@ export {
   app,
   auth,
   database,
+  deleteAlarmData,
   getAlarmData,
+  getReposCodeData,
   saveAlarmData,
   saveReposCodeData,
-  getReposCodeData,
 };

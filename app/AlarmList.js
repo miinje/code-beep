@@ -1,8 +1,12 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../components/CustomText";
-import { getReposCodeData } from "../firebaseConfig.mjs";
+import {
+  deleteAlarmData,
+  getAlarmData,
+  getReposCodeData,
+} from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { fetchFileContent } from "../utils/api";
@@ -15,12 +19,17 @@ export default function AlarmList() {
     allAlarmData,
     isTimeMatched,
     currentTime,
+    isActivateEdit,
+    isDeleteAlarm,
+    setAllAlarmData,
     setIsTimeMatched,
     setCurrentTime,
     setAlarmQuiz,
+    setIsDeleteAlarm,
   } = alarmStore();
   const [isIncludedDay, setIncludedDay] = useState(false);
   const { userUid, userRepoCodeData, setUserRepoCodeData } = userStore();
+  const [deletedAlarms, setDeletedAlarms] = useState([]);
 
   useEffect(() => {
     if (userRepoCodeData) {
@@ -101,6 +110,24 @@ export default function AlarmList() {
   }, [currentTime, allAlarmData, isIncludedDay]);
 
   useEffect(() => {
+    if (isDeleteAlarm) {
+      const deleteAlarmDatas = async () => {
+        deletedAlarms.map(async (dataId) => {
+          await deleteAlarmData(userUid, dataId);
+        });
+
+        const getAllalarmData = await getAlarmData(userUid);
+
+        setAllAlarmData(getAllalarmData);
+        setDeletedAlarms([]);
+        setIsDeleteAlarm(false);
+      };
+
+      deleteAlarmDatas();
+    }
+  }, [isDeleteAlarm]);
+
+  useEffect(() => {
     if (isTimeMatched) {
       router.replace("/ActionAlarm");
     }
@@ -132,7 +159,29 @@ export default function AlarmList() {
         });
 
         return (
-          <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
+          <TouchableOpacity
+            key={`${selectedTime}`}
+            style={[
+              styles.buttonBox,
+              {
+                backgroundColor: !deletedAlarms.includes(selectedTime)
+                  ? "#565656"
+                  : "#373737",
+              },
+            ]}
+            disabled={!isActivateEdit}
+            onPress={() => {
+              if (!deletedAlarms.includes(selectedTime)) {
+                setDeletedAlarms([...deletedAlarms, selectedTime]);
+              } else {
+                const newDeletedAlarms = deletedAlarms.filter(
+                  (data) => data !== selectedTime
+                );
+
+                setDeletedAlarms(newDeletedAlarms);
+              }
+            }}
+          >
             <CustomText text={selectedTitle} size={12} textColor="#C5C5C5" />
             <View style={styles.slectedTimeBox}>
               <View
@@ -145,15 +194,36 @@ export default function AlarmList() {
                 }}
               >
                 <View style={{ paddingBottom: 3, marginRight: -3 }}>
-                  <CustomText text={alarmDayNight} size={16} />
+                  <CustomText
+                    text={alarmDayNight}
+                    size={16}
+                    textColor={
+                      !deletedAlarms.includes(selectedTime)
+                        ? "#ffffff"
+                        : "#C0C0C0"
+                    }
+                  />
                 </View>
                 <CustomText
                   text={
                     String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour
                   }
                   size={30}
+                  textColor={
+                    !deletedAlarms.includes(selectedTime)
+                      ? "#ffffff"
+                      : "#C0C0C0"
+                  }
                 />
-                <CustomText text=":" size={30} />
+                <CustomText
+                  text=":"
+                  size={30}
+                  textColor={
+                    !deletedAlarms.includes(selectedTime)
+                      ? "#ffffff"
+                      : "#C0C0C0"
+                  }
+                />
                 <CustomText
                   text={
                     String(alarmMinute).length < 2
@@ -161,18 +231,23 @@ export default function AlarmList() {
                       : alarmMinute
                   }
                   size={30}
+                  textColor={
+                    !deletedAlarms.includes(selectedTime)
+                      ? "#ffffff"
+                      : "#C0C0C0"
+                  }
                 />
               </View>
               <View style={styles.dayItemsBox}>{dayItems}</View>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         );
       });
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Header />
+        <Header setDeletedAlarms={setDeletedAlarms} />
       </View>
       <View style={styles.alarmListBox}>
         {allAlarmData ? (
@@ -237,9 +312,8 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: "center",
   },
-  buttonBorder: {
+  buttonBox: {
     height: 90,
-    backgroundColor: "#565656",
     borderRadius: 10,
     shadowColor: "#242424",
     shadowOffset: {
