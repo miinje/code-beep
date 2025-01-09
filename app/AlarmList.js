@@ -108,64 +108,66 @@ export default function AlarmList() {
 
   const alarmItems =
     allAlarmData &&
-    Object.keys(allAlarmData).map((key) => {
-      const { selectedDays, selectedTime, selectedTitle } = allAlarmData[key];
-      const currentTime = new Date(selectedTime);
-      const alarmHour = currentTime.getHours() % 12 || 12;
-      const alarmMinute = currentTime.getMinutes();
-      const alarmDayNight = currentTime.getHours() < 12 ? "오전" : "오후";
-      const allDay = ["일", "월", "화", "수", "목", "금", "토"];
+    Object.keys(allAlarmData)
+      .sort((a, b) => a - b)
+      .map((key) => {
+        const { selectedDays, selectedTime, selectedTitle } = allAlarmData[key];
+        const currentTime = new Date(selectedTime);
+        const alarmHour = currentTime.getHours() % 12 || 12;
+        const alarmMinute = currentTime.getMinutes();
+        const alarmDayNight = currentTime.getHours() < 12 ? "오전" : "오후";
+        const allDay = ["일", "월", "화", "수", "목", "금", "토"];
 
-      const dayItems = allDay.map((day) => {
-        const isSelected = selectedDays.includes(day);
+        const dayItems = allDay.map((day) => {
+          const isSelected = selectedDays.includes(day);
+
+          return (
+            <CustomText
+              key={day}
+              text={day}
+              size={10}
+              textColor={isSelected ? "#fff" : "#808080"}
+            />
+          );
+        });
 
         return (
-          <CustomText
-            key={day}
-            text={day}
-            size={10}
-            textColor={isSelected ? "#fff" : "#808080"}
-          />
+          <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
+            <CustomText text={selectedTitle} size={12} textColor="#C5C5C5" />
+            <View style={styles.slectedTimeBox}>
+              <View
+                style={{
+                  flex: 0,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "center",
+                  gap: 10,
+                }}
+              >
+                <View style={{ paddingBottom: 3, marginRight: -3 }}>
+                  <CustomText text={alarmDayNight} size={16} />
+                </View>
+                <CustomText
+                  text={
+                    String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour
+                  }
+                  size={30}
+                />
+                <CustomText text=":" size={30} />
+                <CustomText
+                  text={
+                    String(alarmMinute).length < 2
+                      ? "0" + alarmMinute
+                      : alarmMinute
+                  }
+                  size={30}
+                />
+              </View>
+              <View style={styles.dayItemsBox}>{dayItems}</View>
+            </View>
+          </Pressable>
         );
       });
-
-      return (
-        <Pressable key={`${selectedTime}`} style={styles.buttonBorder}>
-          <CustomText text={selectedTitle} size={12} textColor="#C5C5C5" />
-          <View style={styles.slectedTimeBox}>
-            <View
-              style={{
-                flex: 0,
-                flexDirection: "row",
-                alignItems: "flex-end",
-                justifyContent: "center",
-                gap: 10,
-              }}
-            >
-              <View style={{ paddingBottom: 3, marginRight: -3 }}>
-                <CustomText text={alarmDayNight} size={16} />
-              </View>
-              <CustomText
-                text={
-                  String(alarmHour).length < 2 ? "0" + alarmHour : alarmHour
-                }
-                size={30}
-              />
-              <CustomText text=":" size={30} />
-              <CustomText
-                text={
-                  String(alarmMinute).length < 2
-                    ? "0" + alarmMinute
-                    : alarmMinute
-                }
-                size={30}
-              />
-            </View>
-            <View style={styles.dayItemsBox}>{dayItems}</View>
-          </View>
-        </Pressable>
-      );
-    });
 
   return (
     <View style={styles.container}>
