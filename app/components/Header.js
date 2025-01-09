@@ -3,7 +3,7 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustomText from "../../components/CustomText";
 import alarmStore from "../../store/alarmStore";
 
-export default function Header({ setDeletedAlarms }) {
+export default function Header({ deletedAlarms, setDeletedAlarms }) {
   const { isActivateEdit, setIsActivateEdit, setIsDeleteAlarm } = alarmStore();
   const router = useRouter();
 
@@ -11,23 +11,31 @@ export default function Header({ setDeletedAlarms }) {
     if (!isActivateEdit) {
       setIsActivateEdit(true);
     } else {
-      Alert.alert("알람을 삭제하시겠습니까?", "이 과정은 되돌릴 수 없습니다", [
-        {
-          text: "취소",
-          onPress: () => {
-            setIsActivateEdit(false);
-            setDeletedAlarms([]);
-          },
-          style: "cancel",
-        },
-        {
-          text: "확인",
-          onPress: async () => {
-            setIsDeleteAlarm(true);
-            setIsActivateEdit(false);
-          },
-        },
-      ]);
+      if (deletedAlarms.length === 0) {
+        setIsActivateEdit(false);
+      } else {
+        Alert.alert(
+          "알람을 삭제하시겠습니까?",
+          "이 과정은 되돌릴 수 없습니다",
+          [
+            {
+              text: "취소",
+              onPress: () => {
+                setIsActivateEdit(false);
+                setDeletedAlarms([]);
+              },
+              style: "cancel",
+            },
+            {
+              text: "확인",
+              onPress: async () => {
+                setIsDeleteAlarm(true);
+                setIsActivateEdit(false);
+              },
+            },
+          ]
+        );
+      }
     }
   };
 

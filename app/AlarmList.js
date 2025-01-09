@@ -247,7 +247,10 @@ export default function AlarmList() {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Header setDeletedAlarms={setDeletedAlarms} />
+        <Header
+          deletedAlarms={deletedAlarms}
+          setDeletedAlarms={setDeletedAlarms}
+        />
       </View>
       <View style={styles.alarmListBox}>
         {allAlarmData ? (
