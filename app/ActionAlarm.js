@@ -108,21 +108,24 @@ export default function ActionAlarm() {
               height: 23,
               flex: 0,
               flexDirection: "row",
-              PaddingBottom: 5,
+              marginTop: -5,
+              marginBottom: 5,
               gap: 5,
             }}
           >
             {returnBlankSpace.map((blank, index) => {
-              const borderWidth = blank === " " ? 2 : 0;
+              const borderWidth = blank === " " ? 1 : 0;
 
               return (
                 <Text
                   key={index}
                   style={{
-                    width: 7,
+                    width: 6,
                     borderBottomColor: "#ffffff",
                     borderBottomWidth: borderWidth,
                     color: "#ffffff",
+                    fontSize: 10,
+                    textAlign: "center",
                   }}
                 >
                   {blank}
@@ -192,7 +195,7 @@ export default function ActionAlarm() {
               <Text style={styles.rootText}>{alarmQuiz[0].filesRoot}</Text>
               <Text style={styles.rootText}>JavaScript</Text>
             </View>
-            <View style={{ flex: 0, gap: 5, marginTop: 10 }}>
+            <View style={{ flex: 0, gap: 3, marginTop: 10 }}>
               {alarmQuizItems}
             </View>
           </View>
@@ -260,20 +263,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 370,
     height: 100,
-    gap: 20,
+    gap: 15,
   },
   fileRootText: {
-    flex: 0,
-    width: 350,
+    minWidth: 350,
+    maxWidth: 370,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginLeft: -15,
+    marginLeft: -12,
     marginTop: -10,
     marginBottom: 10,
   },
   quizTextBox: {
-    width: 370,
-    minHeight: 340,
+    minWidth: 370,
+    maxWidth: 380,
+    minHeight: 350,
     maxHeight: 370,
     borderWidth: 3,
     backgroundColor: "#383838",
@@ -283,7 +287,7 @@ const styles = StyleSheet.create({
   rootText: {
     fontFamily: "CONSOLA",
     color: "#C0C0C0",
-    fontSize: 10,
+    fontSize: 9,
   },
   quizText: {
     fontFamily: "CONSOLA",
