@@ -47,7 +47,10 @@ export default function AddAlarm() {
     const newSetTime = new Date();
 
     if (selectedAmPm === "오후") {
-      newSetTime.setHours(selectedHours + 12, selectedMinutes);
+      newSetTime.setHours(
+        selectedHours === 12 ? 12 : selectedHours + 12,
+        selectedMinutes
+      );
     } else {
       newSetTime.setHours(
         selectedHours === 12 ? 0 : selectedHours,
