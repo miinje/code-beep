@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   quizTextBox: {
     minWidth: 370,
-    maxWidth: 380,
+    maxWidth: 385,
     minHeight: 330,
     maxHeight: 350,
     borderWidth: 2,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 50,
     borderRadius: 10,
-    fontSize: 13,
+    fontSize: 12.5,
   },
   buttonInnerBox: {
     flex: 1,
