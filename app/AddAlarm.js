@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "top",
     alignItems: "center",
-    marginTop: 20,
+    paddingTop: 20,
     gap: 10,
   },
   titleAddText: {
