@@ -8,13 +8,16 @@
 - [개발 환경](#개발-환경)
 - [UI 미리보기](#ui-미리보기)
 - [문제 해결하기](#문제-해결하기)
-  - [1.사용자의 리포지토리에서 특정 조건에 따라 코드 가져오기](#1-사용자의-리포지토리에서-특정-조건에-따라-코드-가져오기)
-  - [2.다양한 언어의 코드 분석하기](#2-다양한-언어의-코드-분석하기)
+  - [1. 사용자의 리포지토리에서 특정 조건에 따라 파일 저장하기](#1-사용자의-리포지토리에서-특정-조건에-따라-파일-저장하기)
+    - [1-1. 사용자의 깃허브에서 최근 업데이트 된 리포지토리 가져오기](#1-1-사용자의-깃허브에서-최근-업데이트-된-리포지토리-가져오기)
+    - [1-2. 가져온 리포지토리 파일 필터링 하기](#1-2-가져온-리포지토리-파일-필터링-하기)
+  - [2. 사용자의 코드 분석해 퀴즈 만들기](#2-사용자의-코드-분석해-퀴즈-만들기)
+    - [2-1. 파일에서 함수 분리하기](#2-1-파일에서-함수-분리하기)
+    - [2-2. 반환값 추출하기](#2-2-반환값-추출하기)
 - [개선할 사항](#개선할-사항)
   - [1. 알람 시간을 어떻게 감지할 수 있을까](#1-알람-시간을-어떻게-감지할-수-있을까)
     - [1-1. Foreground Service를 이용해 알람 시간 확인하기](#1-1-foreground-service를-이용해-알람-시간-확인하기)
     - [1-2. Alarm Manager를 이용해 알람 예약하기](#1-2-alarm-manager를-이용해-알람-예약하기)
-- [개인 회고](#개인-회고)
 
 ## 프로젝트 동기
 
@@ -36,9 +39,214 @@
 
 ## 문제 해결하기
 
-### 1. 사용자의 리포지토리에서 특정 조건에 따라 코드 가져오기
+### 1. 사용자의 리포지토리에서 특정 조건에 따라 파일 저장하기
 
-### 2. 다양한 언어의 코드 분석하기
+제 프로젝트에서는 사용자의 최근 작업을 바탕으로 퀴즈를 출제합니다. 이 기능의 의도는 사용자가 작성 중인 코드 내용을 기반으로 진행 중인 작업들을 상기시키기 것입니다. 이를 위해 사용자가 최근 작업한 리포지토리에서 코드 파일을 가져와야 합니다.
+
+#### 1-1. 사용자의 깃허브에서 최근 업데이트 된 리포지토리 가져오기
+
+REST API를 이용해 사용자의 리포지토리 안에 있는 파일을 가져오기 위해서는 아래와 같은 단계를 거쳐야 합니다.
+
+1. 사용자의 토큰을 가져옵니다.
+2. 토큰을 이용해 가장 최근 업데이트 된 리포지토리 한 개를 가져옵니다.
+3. 리포지토리에서 모든 디렉토리를 탐지해 파일을 가져옵니다.
+
+먼저 제 애플리케이션에서 사용자는 깃허브 인증을 통해 로그인을 하게 됩니다. 이때 토큰을 통해 리포지토리 등의 정보를 요청하기 때문에 사용자의 Github 토큰을 받아옵니다.
+
+<details>
+<summary style="color: gray;">사용자 토큰 받아오기</summary>
+
+```js
+export async function createTokenWithCode(code) {
+  // code:
+  const url = `https://github.com/login/oauth/access_token`;
+
+  const bodyData = {
+    client_id: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
+    client_secret: process.env.EXPO_PUBLIC_GITHUB_CLIENT_SECRET,
+    code: code,
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyData),
+  });
+
+  return response.json();
+}
+```
+
+`useAuthRequest` 성공 시 `response` 객체에 담겨 있는 정보입니다.
+
+</details>
+
+그 다음, 사용자의 리포지토리를 가져옵니다. 이때 요청 엔드포인트에 가장 최근에 업데이트 된 리포지토리를 가져오도록 설정합니다. 이렇게 하면 사용자가 가장 최근 작업한 리포지토리의 정보를 가져오게 됩니다.
+
+```js
+// 가장 마지막 업데이트 리포지토리 가져오기
+const url = `https://api.github.com/users/${userName}/repos?sort=updated&direction=desc&per_page=1`;
+```
+
+리포지토리의 이름을 받아오고, 이렇게 받아온 리포지토리의 내부 파일들을 탐색하려면 또 한 번 요청을 보내야 합니다. 파일에 대한 요청은 파일 단위로 이뤄지기 때문에 모든 디렉토리 파일을 탐색할 수 있도록 재귀적으로 작업합니다.
+
+재귀적으로 탐색하기 위해 리포지토리에서 탐색된 파일이 디렉토리라면 함수를 재귀 호출하여 다시 탐색합니다. 이 과정을 반복하여 리포지토리 안에 모든 파일을 탐색하게 합니다.
+
+```js
+if (file.type === "dir") {
+  const nestedFiles = await fetchFilesRecursive(
+    accessToken,
+    owner,
+    repo,
+    visitedPaths,
+    file.path,
+    depth + 1,
+    maxDepth
+  );
+}
+```
+
+만약 리포지토리에 파일이 많다면 Github API의 사용량이 과도하게 많아지게 됩니다. 이렇게 되면 제대로 데이터를 받아오지 못 하는 문제가 생기기도 합니다. 이런 현상을 방지하기 위해 파일의 깊이를 제한하여 탐색했습니다. 보통의 파일인 경우 3단계를 넘지 않기 때문에 3 이상의 깊이가 됐다면 더 이상 탐색하지 않도록 했습니다.
+
+```js
+if (depth > maxDepth) return [];
+```
+
+또한 이미 방문한 경로라면 다시 방문하지 않도록 경로를 따로 저장해 둬 같은 리포지토리 재탐색을 방지했습니다.
+
+```js
+const visitedPaths = new Set();
+
+if (visitedPaths.has(path)) {
+  return [];
+}
+
+visitedPaths.add(path);
+```
+
+이렇게 받아온 파일을 필터링 해 필요한 파일만 데이터에 저장합니다.
+
+#### 1-2. 가져온 리포지토리 파일 필터링 하기
+
+필요한 파일이란 사용자가 작성한 코드가 있는 파일입니다. 사용자가 작성한 코드를 직접적으로 알 수 없기 때문에 기준을 세워 최대한 가능성을 높이기 위해 노력했습니다. 그 기준은 아래와 같습니다.
+
+1. `README.md`, `package.json`, `config.js` 등 설정 파일은 제외한다.
+2. `node_modules/`, `.github/`, `dist/` 등 불필요한 경로는 제외한다.
+3. 확장자가 `.js`, `.ts`, `.py` 등 프로그래밍 언어 확장자만 가지고 온다.
+
+Github REST API에서는 이 파일에 대해 미리 필터링을 해 주지 않습니다. 모든 파일을 가져온 후, 설정 파일 및 불필요한 경로를 걸러내어 실제 코드 파일만 남깁니다.
+
+```js
+const validExtensions = [".js", ".ts", ".py", ".java"];
+if (!validExtensions.some((ext) => file.path.endsWith(ext))) {
+  return; // 프로그래밍 언어가 아닌 경우 제외
+}
+```
+
+최종적으로 코드 파일 중에도 실제 코드 로직이 작성된 파일을 식별하기 위해 `function`, `class` 등의 코드 패턴을 포함한 파일을 거친 후 남은 파일들을 데이터 베이스에 저장하게 됩니다.
+
+```js
+const fileContent = await fetchFileContent(fileUrl);
+
+if (fileContent.includes("function") || fileContent.includes("class") || ...) {
+  // 코드 로직이 포함된 파일만 추가
+  filteredFiles.push(file);
+}
+
+```
+
+이 과정을 통해 깃허브 리포지토리에서 불필요한 파일을 걸러내고, 사용자가 작성했을 가능성이 높은 파일들을 선별할 수 있었습니다.
+
+### 2. 사용자의 코드 분석해 퀴즈 만들기
+
+사용자의 코드를 사용해 퀴즈를 낼 때 고려했던 것은 사용자가 답을 예측할 수 있는 퀴즈를 내는 것이었습니다. 단순히 코드를 일부 제거하는 것이 아니라, 맥락을 유지하면서 사용자가 충분히 이해할 수 있는 위치에서 빈칸을 생성해야 합니다. 그러기 위해서는 코드의 구조를 이해하고 의미 있는 부분을 추출하는 과정이 필요합니다.
+
+이를 위해 함수 단위로 코드를 분석하고, 단계적으로 문제를 생성하는 방식을 적용했습니다.
+
+#### 2-1. 파일에서 함수 분리하기
+
+함수는 대부분 자바스크립트에서 주요 동작을 담당하며, 내부에서 사용하는 변수나 조건식도 함수 내 또는 함수의 매개변수로 전달되기 때문에 사용자가 더 쉽게 맥락을 파악할 수 있을 것이라 생각했습니다.
+
+모든 내용을 담고 있는 최상위 함수 단위로 코드를 추출합니다. 함수의 범위를 찾기 위해 `function`이라는 키워드를 찾습니다. 이후 중괄호 `{}`를 기준으로 여닫는 횟수를 세어 스코프를 파악합니다.
+
+```js
+const functionIndex = code.indexOf("function");
+const startIndex = code.indexOf("{", functionIndex);
+let count = 0;
+let endIndex = startIndex;
+
+for (let i = startIndex; i < code.length; i++) {
+  if (code[i] === "{") {
+    count++; // 여는 중괄호일 때는 더합니다.
+  } else if (code[i] === "}") {
+    count--; // 닫는 중괄호라면 뺍니다.
+  }
+
+  if (count === 0) {
+    endIndex = i; // 만약 count가 0이라면 최상위 함수의 스코프가 끝났다고 가정합니다.
+
+    break;
+  }
+}
+
+// startIndex과 endIndex + 1를 이용해 영역을 확인합니다.
+```
+
+위 코드를 이용해 `function` 키워드를 기준으로 최상위 함수의 영역을 찾습니다.
+
+#### 2-2. 반환값 추출하기
+
+제 알고리즘에서는 `return` 값을 기준으로 빈칸이 생성됩니다. `return` 구문은 함수의 주요 역할을 나타냅니다. 이를 퀴즈의 빈칸으로 설정하면 사용자가 함수의 동작을 파악하고 답을 예측하기 더 수월할 것이라 생각했습니다.
+분리된 함수에서 `return` 값이 있는지 찾습니다. 만약 `return` 값이 없는 함수라면 문제에 적용시키지 않습니다. 값이 있다면 함수의 코드 블록 안에서 `return` 키워드가 포함된 줄을 찾습니다.
+
+```js
+const returnStatements = [];
+const lines = functionCode.split("\n");
+
+for (const line of lines) {
+  if (line.trim().startsWith("return")) {
+    returnStatements.push(line.trim()); // returnStatements = ["return sum;"]
+  }
+}
+```
+
+이 코드에서는 `return sum;`을 반환 구문으로 추출합니다. 이렇게 추출된 반환 구문을 이용해 빈칸으로 변경하고, 데이터에 저장합니다.
+
+```js
+let quizCode = functionCode;
+
+// 반환값을 빈칸으로 변경
+for (const returnStatement of returnStatements) {
+  quizCode = quizCode.replace(returnStatement, "return ___;");
+}
+```
+
+이런 과정을 거쳐 사용자에게 제공될 퀴즈를 생성합니다. 만약 아래와 같은 함수를 추출했다고 가정한다면
+
+```js
+function calculateSum(arr) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum;
+}
+```
+
+위 알고리즘을 통해 생성된 함수는 아래와 같은 방식으로 표기됩니다.
+
+```js
+function calculateSum(arr) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return ___;
+}
+```
 
 ## 개선할 사항
 
