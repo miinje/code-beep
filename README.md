@@ -310,7 +310,7 @@ const stopBackgroundTask = async () => {
 <table style="border: 1px solid gray">
 	<tr>
 		<th>
-		<img width="389px" height="260px" alt="오류 화면" src="https://github.com/user-attachments/assets/a6038f4e-a35d-467d-abdb-6854f8e7b250" />
+		<img width="389px" height="260px" alt="background actions" src="https://github.com/user-attachments/assets/a6038f4e-a35d-467d-abdb-6854f8e7b250" />
 		</th>
 	</tr>
 	<tr>
@@ -333,7 +333,17 @@ const stopBackgroundTask = async () => {
 
 이 코드를 작성하게 되면 애플리케이션에 포그라운드 서비스 실행 권한이 부여됩니다.
 
-![foreground service 권한 설정](https://github.com/user-attachments/assets/02e781d8-4f1a-4609-9a37-1791d1371bf3)
+<table style="border: 1px solid gray">
+	<tr>
+		<th>
+		<img width="389px" height="260px" alt="foreground service 권한 설정" src="https://github.com/user-attachments/assets/02e781d8-4f1a-4609-9a37-1791d1371bf3" />
+		</th>
+	</tr>
+	<tr>
+		<td>foreground service 권한 설정</td>
+	<tr>
+</table>
+
 
 이제 백그라운드에서 작업할 서비스를 설정하면 됩니다.
 
