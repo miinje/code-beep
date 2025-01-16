@@ -213,7 +213,17 @@ initializeBackgroundFetch();
 #### ⚠️ 15분에 한 번만 작업을 수행하는 문제점
 
 background fetch는 15분에 한 번씩 작업을 수행합니다.
-![background fetch](https://github.com/user-attachments/assets/7146cfe5-2408-4b78-a352-177b97b29cd2)
+
+<table style="border: 1px solid gray">
+	<tr>
+		<th>
+		<img width="489px" height="47px" alt="background fetch" src="https://github.com/user-attachments/assets/7146cfe5-2408-4b78-a352-177b97b29cd2" />
+		</th>
+	</tr>
+	<tr>
+		<td>background fetch</td>
+	<tr>
+</table>
 
 알람 애플리케이션 특성상 지속적인 시간 확인이 필요합니다. 만약 background fetch를 사용하면 사용자가 백그라운드 작업이 종료되고 15분 이내에 15분 이전의 알람을 맞추게 되면 사용자는 해당 알람을 들을 수 없습니다.
 
@@ -297,7 +307,16 @@ const stopBackgroundTask = async () => {
 
 `react-native-background-actions`은 백그라운드에서 작업을 진행할 때 제한을 두지 않습니다. 알람 어플 특성대로 계속 백그라운드 작업을 실행할 수 있었습니다.
 
-![background actions](https://github.com/user-attachments/assets/a6038f4e-a35d-467d-abdb-6854f8e7b250)
+<table style="border: 1px solid gray">
+	<tr>
+		<th>
+		<img width="389px" height="260px" alt="오류 화면" src="https://github.com/user-attachments/assets/a6038f4e-a35d-467d-abdb-6854f8e7b250" />
+		</th>
+	</tr>
+	<tr>
+		<td>background actions</td>
+	<tr>
+</table>
 
 이러한 이유로 `react-native-background-actions`을 선택했습니다.
 
@@ -396,7 +415,7 @@ BackgroundService.start는 백그라운드 작업을 시작할 수 있도록 합
 <table style="border: 1px solid gray">
 	<tr>
 		<th>
-		<img width="350" height="100%" alt="오류 화면" src="https://github.com/user-attachments/assets/1cd6723a-9306-4f8d-ac60-47b7f18c31f0" />
+		<img width="350" height="205px" alt="오류 화면" src="https://github.com/user-attachments/assets/1cd6723a-9306-4f8d-ac60-47b7f18c31f0" />
 		</th>
 	</tr>
 	<tr>
