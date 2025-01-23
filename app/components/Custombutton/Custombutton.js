@@ -1,5 +1,6 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import CustomText from "./CustomText";
+import { Image, TouchableOpacity, View } from "react-native";
+import CustomText from "../../../components/CustomText";
+import styles from "./styles";
 
 export default function CustomButton({
   title,
@@ -27,30 +28,3 @@ export default function CustomButton({
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  Button: {
-    flex: 0,
-    width: "100%",
-    height: 55,
-    borderRadius: 50,
-  },
-  box: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  logo: {
-    flex: 1,
-    resizeMode: "center",
-    width: 35,
-    height: 35,
-  },
-  text: {
-    fontSize: 21,
-  },
-});
