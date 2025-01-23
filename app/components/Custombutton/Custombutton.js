@@ -1,5 +1,5 @@
 import { Image, TouchableOpacity, View } from "react-native";
-import CustomText from "../../../components/CustomText";
+import CustomText from "../CustomText/CustomText";
 import styles from "./styles";
 
 export default function CustomButton({

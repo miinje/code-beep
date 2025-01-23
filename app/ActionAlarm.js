@@ -11,11 +11,11 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import CustomText from "../components/CustomText";
-import alarmStore from "../store/alarmStore";
-import { stopAudio } from "../utils/audioPlayer";
 import CodeHighlighter from "react-native-code-highlighter";
 import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import alarmStore from "../store/alarmStore";
+import { stopAudio } from "../utils/audioPlayer";
+import CustomText from "./components/CustomText/CustomText";
 
 export default function ActionAlarm() {
   const { currentTime, alarmQuiz, setCurrentTime, setIsTimeMatched } =

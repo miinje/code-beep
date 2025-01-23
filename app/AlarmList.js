@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import CustomText from "../components/CustomText";
 import {
   deleteAlarmData,
   getAlarmData,
@@ -12,6 +11,7 @@ import userStore from "../store/userStore";
 import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
 import { makeQuizFunction } from "../utils/makeQuizFunction";
+import CustomText from "./components/CustomText/CustomText";
 import Header from "./components/Header/Header";
 
 export default function AlarmList() {

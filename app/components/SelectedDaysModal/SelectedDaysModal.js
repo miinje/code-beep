@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
-import CustomText from "../../../components/CustomText";
+import CustomText from "../CustomText/CustomText";
 import {
   convertingNumberDay,
   convertingStringDay,

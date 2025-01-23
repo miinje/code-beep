@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { Alert, TouchableOpacity, View } from "react-native";
-import CustomText from "../../../components/CustomText";
 import alarmStore from "../../../store/alarmStore";
+import CustomText from "../CustomText/CustomText";
 import styles from "./styles";
 
 export default function Header({ deletedAlarms, setDeletedAlarms }) {

@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import CustomText from "../components/CustomText";
 import { auth, getAlarmData, saveAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { convertingStringDay } from "../utils/convertingDay";
 import onScroll from "../utils/onScroll";
 import CustomButton from "./components/Custombutton/Custombutton";
+import CustomText from "./components/CustomText/CustomText";
 import SelectedDaysModal from "./components/SelectedDaysModal/SelectedDaysModal";
 
 export default function AddAlarm() {

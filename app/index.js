@@ -10,13 +10,13 @@ import {
 } from "firebase/auth";
 import { useEffect } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import CustomText from "../components/CustomText";
+import CustomText from "./components/CustomText/CustomText";
+
 import { auth, getAlarmData, saveReposCodeData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
-import { getCodeFiles, getGithubUser } from "../utils/api";
+import { fetchRecentRepo, getCodeFiles, getGithubUser } from "../utils/api";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
-import { fetchRecentRepo } from "../utils/api";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
