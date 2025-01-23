@@ -1,12 +1,13 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import CustomText from "../../components/CustomText";
+import React from "react";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
+import CustomText from "../CustomText/CustomText";
 import {
   convertingNumberDay,
   convertingStringDay,
-} from "../../utils/convertingDay";
-import React from "react";
+} from "../../../utils/convertingDay";
+import styles from "./styles";
 
-export default function SelectedDays({
+export default function SelectedDaysModal({
   isOpenDayModal,
   setIsOpenDayModal,
   selectedDays,
@@ -87,51 +88,3 @@ export default function SelectedDays({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modal: {
-    width: 200,
-    height: 200,
-    zIndex: 20,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "#242424",
-    borderRadius: 20,
-    padding: 15,
-    alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    width: "100%",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginTop: 30,
-    backgroundColor: "#ffffff",
-  },
-  textStyle: {
-    color: "#000000",
-    fontWeight: "normal",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  checkIcon: {
-    color: "#0fff00",
-  },
-});

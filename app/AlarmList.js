@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import CustomText from "../components/CustomText";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import {
   deleteAlarmData,
   getAlarmData,
@@ -12,7 +11,9 @@ import userStore from "../store/userStore";
 import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
 import { makeQuizFunction } from "../utils/makeQuizFunction";
-import Header from "./components/Header";
+import CustomText from "./components/CustomText/CustomText";
+import Header from "./components/Header/Header";
+import { alarmListStyles } from "./styles";
 
 export default function AlarmList() {
   const {
@@ -162,7 +163,7 @@ export default function AlarmList() {
           <TouchableOpacity
             key={`${selectedTime}`}
             style={[
-              styles.buttonBox,
+              alarmListStyles.buttonBox,
               {
                 backgroundColor: !deletedAlarms.includes(selectedTime)
                   ? "#565656"
@@ -183,7 +184,7 @@ export default function AlarmList() {
             }}
           >
             <CustomText text={selectedTitle} size={12} textColor="#C5C5C5" />
-            <View style={styles.slectedTimeBox}>
+            <View style={alarmListStyles.slectedTimeBox}>
               <View
                 style={{
                   flex: 0,
@@ -238,21 +239,21 @@ export default function AlarmList() {
                   }
                 />
               </View>
-              <View style={styles.dayItemsBox}>{dayItems}</View>
+              <View style={alarmListStyles.dayItemsBox}>{dayItems}</View>
             </View>
           </TouchableOpacity>
         );
       });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
+    <View style={alarmListStyles.container}>
+      <View style={alarmListStyles.headerContainer}>
         <Header
           deletedAlarms={deletedAlarms}
           setDeletedAlarms={setDeletedAlarms}
         />
       </View>
-      <View style={styles.alarmListBox}>
+      <View style={alarmListStyles.alarmListBox}>
         {allAlarmData ? (
           <>
             <ScrollView
@@ -275,90 +276,3 @@ export default function AlarmList() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#404040",
-    gap: 2,
-  },
-  headerContainer: {
-    marginTop: 20,
-    marginLeft: 40,
-    marginRight: 40,
-  },
-  alarmListBox: {
-    width: 340,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    pointerEvents: "auto",
-  },
-  alarmListTitleBox: {
-    width: "100%",
-    flex: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 10,
-  },
-  alarmListTitle: {
-    width: 320,
-    fontSize: 35,
-    borderTopWidth: 3,
-    borderColor: "#ffffff",
-    padding: 10,
-    textAlign: "center",
-  },
-  buttonBox: {
-    height: 90,
-    borderRadius: 10,
-    shadowColor: "#242424",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-    marginBottom: 10,
-    padding: 10,
-  },
-  slectedTimeBox: {
-    width: "70%",
-    flex: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    marginLeft: 5,
-    marginTop: 2,
-  },
-  dayItemsBox: {
-    flex: 0.5,
-    flexDirection: "row",
-    gap: 7,
-    marginLeft: 10,
-  },
-  addButton: {
-    zIndex: 10,
-    width: 10,
-    height: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addButtonImg: {
-    width: 60,
-    height: 60,
-    resizeMode: "contain",
-    position: "absolute",
-    flex: 0.1,
-    left: 110,
-    bottom: -50,
-  },
-});
