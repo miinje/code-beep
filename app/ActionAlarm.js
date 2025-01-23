@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Keyboard,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,6 +15,7 @@ import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/esm/styles/
 import alarmStore from "../store/alarmStore";
 import { stopAudio } from "../utils/audioPlayer";
 import CustomText from "./components/CustomText/CustomText";
+import { actionAlarmStyles } from "./styles";
 
 export default function ActionAlarm() {
   const { currentTime, alarmQuiz, setCurrentTime, setIsTimeMatched } =
@@ -26,6 +26,10 @@ export default function ActionAlarm() {
   const [isFontsLoaded] = useFonts({
     CONSOLA: require("../assets/fonts/CONSOLA.ttf"),
   });
+
+  if (!isFontsLoaded) {
+    return null;
+  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -111,9 +115,10 @@ export default function ActionAlarm() {
           padding: 2,
         }}
         textStyle={[
-          styles.quizText,
+          actionAlarmStyles.quizText,
           {
-            fontSize: text.includes("return") ? 12 : 13,
+            fontFamily: "CONSOLA",
+            fontSize: 12,
             width: text.includes("return") && 350,
             backgroundColor: text.includes("return") && "#2e5c90",
             padding: text.includes("return") && 2,
@@ -129,9 +134,9 @@ export default function ActionAlarm() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <View style={styles.topBox}>
-          <View style={styles.currentTimeBox}>
+      <View style={actionAlarmStyles.container}>
+        <View style={actionAlarmStyles.topBox}>
+          <View style={actionAlarmStyles.currentTimeBox}>
             <CustomText
               text={
                 String(currentTime.getHours()).length < 2
@@ -163,13 +168,13 @@ export default function ActionAlarm() {
         </View>
         <View
           style={[
-            styles.quizTextContainer,
+            actionAlarmStyles.quizTextContainer,
             { marginBottom: isKeyboardVisible ? 150 : 0 },
           ]}
         >
           <View
             style={[
-              styles.quizTextBox,
+              actionAlarmStyles.quizTextBox,
               {
                 borderColor:
                   checkResult === ""
@@ -180,14 +185,22 @@ export default function ActionAlarm() {
               },
             ]}
           >
-            <View style={styles.fileRootText}>
-              <Text style={styles.rootText}>{alarmQuiz[0].filesRoot}</Text>
-              <Text style={styles.rootText}>JavaScript</Text>
+            <View style={actionAlarmStyles.fileRootText}>
+              <Text
+                style={[actionAlarmStyles.rootText, { fontFamily: "CONSOLA" }]}
+              >
+                {alarmQuiz[0].filesRoot}
+              </Text>
+              <Text
+                style={[actionAlarmStyles.rootText, { fontFamily: "CONSOLA" }]}
+              >
+                JavaScript
+              </Text>
             </View>
             <View style={{ flex: 0, marginTop: 10 }}>{alarmQuizItems}</View>
           </View>
           <TextInput
-            style={styles.textInput}
+            style={[actionAlarmStyles.textInput, { fontFamily: "CONSOLA" }]}
             value={inputValue}
             onChangeText={setInputValue}
             placeholder="위 코드 내 빈칸에 들어갈 알맞은 답을 쓰세요"
@@ -197,7 +210,7 @@ export default function ActionAlarm() {
         {!isKeyboardVisible ? (
           <TouchableOpacity
             style={[
-              styles.button,
+              actionAlarmStyles.button,
               {
                 backgroundColor: !inputValue ? "#C0C0C0" : "#ffffff",
               },
@@ -205,7 +218,7 @@ export default function ActionAlarm() {
             onPress={handleClickDone}
             disabled={!inputValue}
           >
-            <View style={styles.buttonInnerBox}>
+            <View style={actionAlarmStyles.buttonInnerBox}>
               <CustomText
                 text="완료!"
                 textColor={!inputValue ? "#242424" : "#000000"}
@@ -218,90 +231,3 @@ export default function ActionAlarm() {
     </TouchableWithoutFeedback>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    backgroundColor: "#404040",
-    paddingTop: 30,
-    paddingBottom: 30,
-  },
-  topBox: {
-    flex: 0,
-    width: 400,
-    height: 150,
-    gap: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  currentTimeBox: {
-    flex: 0,
-    marginTop: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-  },
-  quizTextContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 370,
-    height: 100,
-    gap: 15,
-  },
-  fileRootText: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginLeft: -12,
-    marginTop: -10,
-    marginBottom: 10,
-  },
-  quizTextBox: {
-    minWidth: 370,
-    maxWidth: 385,
-    minHeight: 330,
-    maxHeight: 350,
-    borderWidth: 2,
-    backgroundColor: "#282C35",
-    padding: 20,
-    borderRadius: 15,
-  },
-  rootText: {
-    minWidth: 300,
-    maxWidth: 320,
-    fontFamily: "CONSOLA",
-    color: "#C0C0C0",
-    fontSize: 10,
-  },
-  quizText: {
-    fontFamily: "CONSOLA",
-    color: "#ffffff",
-  },
-  textInput: {
-    backgroundColor: "#ffffff",
-    fontFamily: "CONSOLA",
-    textAlign: "center",
-    width: 350,
-    height: 50,
-    borderRadius: 10,
-    fontSize: 12.5,
-  },
-  buttonInnerBox: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  button: {
-    width: "85%",
-    height: 55,
-    borderRadius: 50,
-    backgroundColor: "#ffffff",
-  },
-});

@@ -1,13 +1,7 @@
 import { router } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
 import { auth, getAlarmData, saveAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { convertingStringDay } from "../utils/convertingDay";
@@ -15,6 +9,7 @@ import onScroll from "../utils/onScroll";
 import CustomButton from "./components/Custombutton/Custombutton";
 import CustomText from "./components/CustomText/CustomText";
 import SelectedDaysModal from "./components/SelectedDaysModal/SelectedDaysModal";
+import { addAlarmStyles } from "./styles";
 
 export default function AddAlarm() {
   const { setAllAlarmData } = alarmStore();
@@ -87,12 +82,12 @@ export default function AddAlarm() {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleAddText}>
+    <View style={addAlarmStyles.container}>
+      <View style={addAlarmStyles.titleAddText}>
         <CustomText text="알람 설정" size={25} />
       </View>
-      <View style={styles.pickerContainer}>
-        <View style={styles.amPmPicker}>
+      <View style={addAlarmStyles.pickerContainer}>
+        <View style={addAlarmStyles.amPmPicker}>
           <ScrollView
             ref={amPmScrollView}
             snapToInterval={ITEM_HEIGHT}
@@ -105,7 +100,7 @@ export default function AddAlarm() {
           >
             <View style={{ height: ITEM_HEIGHT * 2 }} />
             {amPm.map((value, index) => (
-              <View key={index} style={styles.item}>
+              <View key={index} style={addAlarmStyles.item}>
                 <CustomText
                   text={value}
                   size={23}
@@ -117,7 +112,7 @@ export default function AddAlarm() {
           </ScrollView>
         </View>
 
-        <View style={styles.picker}>
+        <View style={addAlarmStyles.picker}>
           <ScrollView
             ref={hourScrollView}
             snapToInterval={ITEM_HEIGHT}
@@ -132,7 +127,7 @@ export default function AddAlarm() {
           >
             <View style={{ height: ITEM_HEIGHT * 2 }} />
             {hours.map((hour, index) => (
-              <View key={index} style={styles.item}>
+              <View key={index} style={addAlarmStyles.item}>
                 <CustomText
                   text={String(hour).padStart(2, "0")}
                   size={25}
@@ -144,11 +139,11 @@ export default function AddAlarm() {
           </ScrollView>
         </View>
 
-        <View style={styles.timeStamp}>
+        <View style={addAlarmStyles.timeStamp}>
           <CustomText text=":" size={35} />
         </View>
 
-        <View style={styles.picker}>
+        <View style={addAlarmStyles.picker}>
           <ScrollView
             ref={minuteScrollView}
             snapToInterval={ITEM_HEIGHT}
@@ -161,7 +156,7 @@ export default function AddAlarm() {
           >
             <View style={{ height: ITEM_HEIGHT * 2 }} />
             {minutes.map((minute, index) => (
-              <View key={index} style={styles.item}>
+              <View key={index} style={addAlarmStyles.item}>
                 <CustomText
                   text={String(minute).padStart(2, "0")}
                   size={25}
@@ -174,9 +169,12 @@ export default function AddAlarm() {
         </View>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <View style={styles.buttonBox}>
-          <TouchableOpacity style={styles.button} onPress={clickhandleDayModal}>
+      <View style={addAlarmStyles.buttonContainer}>
+        <View style={addAlarmStyles.buttonBox}>
+          <TouchableOpacity
+            style={addAlarmStyles.button}
+            onPress={clickhandleDayModal}
+          >
             <CustomText text="요일" size={13} />
             <View
               style={{
@@ -191,8 +189,8 @@ export default function AddAlarm() {
             </View>
             <CustomText text=">" size={13} />
           </TouchableOpacity>
-          <View style={styles.buttonBorder}></View>
-          <View style={styles.button} pointerEvents="auto">
+          <View style={addAlarmStyles.buttonBorder}></View>
+          <View style={addAlarmStyles.button} pointerEvents="auto">
             <CustomText text="이름" size={13} />
             <TextInput
               value={selectedTitle}
@@ -208,7 +206,7 @@ export default function AddAlarm() {
             />
           </View>
         </View>
-        <View style={styles.saveButtonContainer}>
+        <View style={addAlarmStyles.saveButtonContainer}>
           <CustomButton title="저장하기" onPress={handleClickSaveData} />
         </View>
       </View>
@@ -224,89 +222,3 @@ export default function AddAlarm() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#404040",
-    width: "100%",
-    flex: 1,
-    justifyContent: "top",
-    alignItems: "center",
-    paddingTop: 20,
-    gap: 10,
-  },
-  titleAddText: {
-    width: "80%",
-    flex: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-    marginTop: 20,
-  },
-  pickerContainer: {
-    width: 300,
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-    borderBottomColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderTopColor: "#ffffff",
-    borderTopWidth: 1,
-  },
-  picker: {
-    height: 200,
-    width: 100,
-    overflow: "hidden",
-    borderRadius: 12,
-  },
-  amPmPicker: {
-    height: 200,
-    width: 100,
-    overflow: "hidden",
-    borderRadius: 12,
-    marginRight: -20,
-  },
-  item: {
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  timeStamp: {
-    marginBottom: 7,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonContainer: {
-    flex: 0,
-    width: "80%",
-  },
-  buttonBox: {
-    flex: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    backgroundColor: "#909090",
-    borderRadius: 10,
-  },
-  button: {
-    flex: 0,
-    flexDirection: "row",
-    width: "95%",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-  },
-  buttonBorder: {
-    width: "95%",
-    flex: 0,
-    textAlign: "center",
-    borderBottomColor: "#ffffff",
-    borderBottomWidth: 1,
-  },
-  saveButtonContainer: {
-    height: "58%",
-    flex: 0,
-    justifyContent: "flex-end",
-  },
-});

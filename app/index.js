@@ -9,7 +9,12 @@ import {
   signInWithCredential,
 } from "firebase/auth";
 import { useEffect } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  loginStylesLoginStylesheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import CustomText from "./components/CustomText/CustomText";
 
 import { auth, getAlarmData, saveReposCodeData } from "../firebaseConfig.mjs";
@@ -17,6 +22,7 @@ import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { fetchRecentRepo, getCodeFiles, getGithubUser } from "../utils/api";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
+import { loginStyles } from "./styles";
 
 SystemUI.setBackgroundColorAsync("#404040");
 
@@ -104,18 +110,21 @@ export default function App() {
   }, [allAlarmData]);
 
   return (
-    <View style={styles.container}>
+    <View style={loginStyles.container}>
       <View>
         <Image
           source={require("../assets/code-beep-icon.png")}
-          style={styles.icon}
+          style={loginStyles.icon}
         />
       </View>
-      <View style={styles.loginButtonWarpper}>
-        <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
-          <View style={styles.buttonInnerBox}>
+      <View style={loginStyles.loginButtonWarpper}>
+        <TouchableOpacity
+          style={loginStyles.button}
+          onPress={() => promptAsync()}
+        >
+          <View style={loginStyles.buttonInnerBox}>
             <Image
-              style={styles.buttonInnerLogo}
+              style={loginStyles.buttonInnerLogo}
               source={require("../assets/github-logo.png")}
             />
             <CustomText
@@ -134,49 +143,3 @@ export default function App() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#404040",
-    gap: 20,
-  },
-  icon: {
-    resizeMode: "center",
-    width: 150,
-    height: 150,
-    marginBottom: 5,
-  },
-  loginButtonWarpper: {
-    width: 300,
-  },
-  button: {
-    padding: 10,
-    flex: 0,
-    width: "100%",
-    height: 55,
-    borderRadius: 50,
-    backgroundColor: "#ffffff",
-    gap: 10,
-  },
-  buttonInnerBox: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  buttonInnerLogo: {
-    flex: 1,
-    resizeMode: "center",
-    width: 30,
-    height: 30,
-  },
-  buttonInnerText: {
-    fontSize: 21,
-  },
-});
