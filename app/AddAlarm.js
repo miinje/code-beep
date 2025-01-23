@@ -14,7 +14,7 @@ import { auth, getAlarmData, saveAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import { convertingStringDay } from "../utils/convertingDay";
 import onScroll from "../utils/onScroll";
-import SelectedDays from "./components/SelectedDays";
+import SelectedDaysModal from "./components/SelectedDaysModal/SelectedDaysModal";
 
 export default function AddAlarm() {
   const { setAllAlarmData } = alarmStore();
@@ -214,7 +214,7 @@ export default function AddAlarm() {
       </View>
 
       {isOpenDayModal && (
-        <SelectedDays
+        <SelectedDaysModal
           isOpenDayModal={isOpenDayModal}
           setIsOpenDayModal={setIsOpenDayModal}
           selectedDays={selectedDays}
