@@ -12,7 +12,7 @@ import userStore from "../store/userStore";
 import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
 import { makeQuizFunction } from "../utils/makeQuizFunction";
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 
 export default function AlarmList() {
   const {

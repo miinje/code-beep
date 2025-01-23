@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
-import CustomText from "../../components/CustomText";
-import alarmStore from "../../store/alarmStore";
+import { Alert, TouchableOpacity, View } from "react-native";
+import CustomText from "../../../components/CustomText";
+import alarmStore from "../../../store/alarmStore";
+import styles from "./styles";
 
 export default function Header({ deletedAlarms, setDeletedAlarms }) {
   const { isActivateEdit, setIsActivateEdit, setIsDeleteAlarm } = alarmStore();
@@ -58,26 +59,3 @@ export default function Header({ deletedAlarms, setDeletedAlarms }) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    width: "100%",
-    flex: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "top",
-    pointerEvents: "auto",
-    marginTop: 10,
-  },
-  editButton: {
-    width: 50,
-    height: 40,
-  },
-  addButton: {
-    width: 50,
-    height: 50,
-    textAlign: "auto",
-    marginTop: -15,
-    marginRight: -15,
-  },
-});
