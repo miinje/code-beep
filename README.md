@@ -2,490 +2,384 @@
 
 사용자가 알람 받길 원하는 시간을 지정하고, 지정된 시간에 알람이 울립니다. 사용자가 작성했던 코드들로 다양한 문제를 제공하여 잠을 깨워 줍니다.
 
-# 목차
+## 목차
 
 - [기획 동기](#기획-동기)
 - [개발 환경](#개발-환경)
 - [UI 미리보기](#ui-미리보기)
-- [구현 기능 1. 코드 분석을 통한 퀴즈 만들기](#구현-기능-1-코드-분석을-통한-퀴즈-만들기)
-	- [[1] 사용자의 리포지토리에서 파일 가져오기](#1-사용자의-리포지토리에서-파일-가져오기)
-		- [(1) 사용자의 리포지토리에서 파일 가져오기](#1-사용자의-리포지토리에서-파일-가져오기)
-		- [(2) REST API 사용량 제한 피하기](#2-REST-API-사용량-제한-피하기)
-		- [(3) 파일 필터링 하기](#3-파일-필터링-하기)
-	- [[2] 사용자의 코드 분석하기](#2-사용자의-코드-분석하기)
-		- [(1) 파일에서 함수 분리하기](#1-파일에서-함수-분리하기)
-		- [(2) 함수의 반환 값 추출하기](#2-함수의-반환-값-추출하기)
-- [구현 기능 2. 알람 시간 감지해서 사용자에게 알려 주기](#구현-기능-2-알람-시간-감지해서-사용자에게-알려-주기)
-	- [[1] React Native 라이브러리로 백그라운드 작업하기](#1-react-native-라이브러리로-백그라운드-작업하기)
-		- [(1) react-native-background-fetch 사용해 작업하기](#1-react-native-background-fetch-사용해-작업하기)
-		- [(2) react-native-background-actions 사용해 작업하기](#2-react-native-background-actions-사용해-작업하기)
-	- [[2] 백그라운드에서 시간 확인하기](#2-백그라운드에서-시간-확인하기)
-- [개선할 사항](#개선할-사항)
-	- [1. 스케줄로 알람 예약하기](#1-스케줄로-알람-예약하기)
-		- [[1] 제한없는 Foreground Services로 인한 ANR 에러](#1-제한없는-foreground-services로-인한-anr-에러)
-		- [[2] Alarm Manager를 이용해 알람 예약하기](#2-alarm-manager를-이용해-알람-예약하기)
+- [구현 기능 1. 사용자의 Github에서 코드 가져오기](#구현-기능-1-사용자의-github에서-코드-가져오기)
+  - [1. 가장 최근 업데이트된 리포지토리 가져오기](#1-가장-최근-업데이트된-리포지토리-가져오기)
+    - [문제점 1. 90일 이내 업데이트하지 않은 사용자 대응 어려움](#문제점-1-90일-이내-업데이트하지-않은-사용자-대응-어려움)
+    - [문제점 2. GitHub API Rate Limit 문제 발생 가능성 높음](#문제점-2-github-api-rate-limit-문제-발생-가능성-높음)
+    - [문제점 3. 사용자가 작성한 코드를 구분하기 어려움](#문제점-3-사용자가-작성한-코드를-구분하기-어려움)
+  - [2. 최근 커밋에서 수정된 파일 가져오기](#2-최근-커밋에서-수정된-파일-가져오기)
+    - [1. 오래도록 업데이트하지 않은 사용자에 대한 처리 가능](#1-오래도록-업데이트하지-않은-사용자에-대한-처리-가능)
+    - [2. GitHub API Rate Limit의 가능성 감소](#2-github-api-rate-limit의-가능성-감소)
+    - [3. 사용자가 작성한 코드를 구분할 수 있음](#3-사용자가-작성한-코드를-구분할-수-있음)
+- [구현 기능 2. 기상 미션 퀴즈 생성하기](#구현-기능-2-기상-미션-퀴즈-생성하기)
+  - [1. Tree-sitter 사용 중 실행 환경 문제로 인한 에러 발생](#1-tree-sitter-사용-중-실행-환경-문제로-인한-에러-발생)
+    - [문제점 1. Node 버전으로 인한 Node.js 라이브러리 사용 어려움](#문제점-1-node-버전으로-인한-nodejs-라이브러리-사용-어려움)
+    - [문제점 2. 프로젝트 assets 폴더 접근 불가능으로 인한 WebView 사용 어려움](#문제점-2-프로젝트-assets-폴더-접근-불가능으로-인한-webview-사용-어려움)
+  - [2. peggy를 활용해 분석하기](#2-peggy를-활용해-분석하기)
+  - [3. 기상 미션 퀴즈 생성하기](#3-기상-미션-퀴즈-생성하기)
+    - [AST 데이터를 탐색해 랜덤한 하나의 값 추출해 코드 빈칸 생성하기](#ast-데이터를-탐색해-랜덤한-하나의-값-추출해-코드-빈칸-생성하기)
+- [구현 기능 3. 등록된 알람 시간 확인하기](#구현-기능-3-등록된-알람-시간-확인하기)
+  - [1. Foreground Service를 사용해 백그라운드 작업 지정하기](#1-foreground-service를-사용해-백그라운드-작업-지정하기)
+    - [1. react-native-background-actions 라이브러리 설치하기](#1-react-native-background-actions-라이브러리-설치하기)
+    - [2. Background 실행할 작업 설정하기](#2-background-실행할-작업-설정하기)
+  - [2. ANR Error 발생 원인과 코드 개선하기](#2-anr-error-발생-원인과-코드-개선하기)
+    - [1) Foreground Service로 인한 ANR 에러](#1-foreground-service로-인한-anr-에러)
+    - [2) Alarm Manager를 이용해 기기에 알람 예약하기(진행 중)](#2-alarm-manager를-이용해-기기에-알람-예약하기진행-중)
 - [개인 회고](#개인-회고)
 
+## 기획 동기
 
-# 기획 동기
+개발자들은 매일 코드를 작성하거나 수정하지만, 이전 작업을 돌아볼 기회는 많지 않습니다. 아침에 알람을 끌 때 전날 작성한 코드를 떠올리며 하루를 시작하면 작업의 흐름을 이어가는 데 도움이 될 것이라는 생각에서 이 프로젝트가 시작되었습니다.
+사용자의 깃허브에서 최신 작업을 가져와 빈칸 퀴즈 형태로 제공해, 알람 해제 과정에서 자연스럽게 코드를 복습할 수 있도록 기획했습니다.
 
-개발자들은 매일 코드를 작성하거나 수정하지만, 이전 작업을 돌아볼 기회는 많지 않습니다. 아침에 알람을 끌 때 전날 작성한 코드를 떠올리며 하루를 시작하면 작업의 흐름을 이어가는 데 도움이 될 것이라는 생각에서 이 프로젝트가 시작되었습니다. 
-사용자의 깃허브에서 최신 작업을 가져와 빈칸 퀴즈 형태로 제공해, 알람 해제 과정에서 자연스럽게 코드를 복습할 수 있도록 기획했습니다. 
+## 개발 환경
 
+![javascript](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![React](https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Expo](https://img.shields.io/badge/expo-1C1E24?style=for-the-badge&logo=expo&logoColor=#D04A37) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34) ![Zustand](https://img.shields.io/badge/zustand-592E42?style=for-the-badge&logo=zustand&logoColor=#592E42)
 
-# 개발 환경
-
-![React Native](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![React](https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Expo](https://img.shields.io/badge/expo-1C1E24?style=for-the-badge&logo=expo&logoColor=#D04A37) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
-
-# UI 미리보기
+## UI 미리보기
 
 ![code beep ui preview](https://github.com/user-attachments/assets/44ecdc0d-cae2-4169-bf66-28dc8f8e519c)
 
-# 구현 기능 1. 코드 분석을 통한 퀴즈 만들기
-지정된 시간에 알람이 실행되면 사용자의 최근 작업을 바탕으로 출제된 퀴즈를 제공합니다. 사용자는 이 퀴즈를 통해 알람을 종료시킬 수 있습니다. 
+## 구현 기능 1. 사용자의 Github에서 코드 가져오기
 
-이떄 퀴즈는 사용자의 깃허브에서 가장 최근 업데이트 된 리포지토리의 내부 코드를 활용해 만듭니다. 그러기 위해서 Github REST API를 활용해 사용자의 리포지토리에서 파일을 가져오고 코드를 분석해 조건에 맞는 퀴즈를 생성해야 합니다.
+가장 중요한 기능 중 하나인 사용자의 코드를 활용한 퀴즈를 생성하기 위해서는 가장 먼저 사용자의 Github에 접근해 리포지토리 내부에 있는 파일을 가져와야 합니다. 사용자가 최근 업데이트한 내용을 지속적으로 상기시킨다는 점에서 최근 작업 중인 내용을 중심으로 가져오는 것이 맞다고 생각했습니다.
 
-## [1] 사용자의 리포지토리에서 파일 가져오기
-사용자의 리포지토리 안에 있는 파일을 가져오기 위해서는 아래와 같은 단계를 거쳐야 합니다.
+그래서 처음 시도한 방식은 최근 업데이트된 리포지토리의 정보를 가져오는 것이었습니다.
 
-### (1) 사용자 토큰을 이용해 최근 리포지토리 파일 탐색하기
+### 1. 가장 최근 업데이트된 리포지토리 가져오기
 
-사용자가 깃허브 인증을 통해 로그인을 하게 되면, 이때 사용자의 토큰을 받아옵니다. 이 토큰을 이용해 사용자의 깃허브에서 리포지토리 등의 정보를 요청하게 됩니다.
+처음에는 가장 최근 업데이트된 리포지토리를 가져오겠다고 생각했습니다. 이러한 결정을 한 데에는 아래와 같은 이유가 있습니다.
 
-그 다음, 토큰을 이용해 리포지토리를 가져옵니다. 이때 사용자의 깃허브에서 가장 최근 업데이트 된 리포지토리를 가져오도록 요청합니다. 이때 가져온 리포지토리의 정보 중 이름 값만 저장합니다.
+> 1. 사용자가 계속 작업 중인 프로젝트의 코드를 가져오고 싶다.
+> 2. 계속 작업 중인 프로젝트라면 내용을 더 기억하기 쉬울 것이다.
+
+주기적인 요청 작업을 진행하도록 계획했습니다. 일주일에 한 번 가장 최근 업데이트된 리포지토리를 가지고 오고, 가지고온 리포지토리를 탐색해 파일 내부 코드를 DB에 저장하도록 지정했습니다.
+
+가장 최근 업데이트된 리포지토리 찾고, 그 리포지토리에 있는 모든 파일을 탐색하게 됩니다. 그러나 만약 리포지토리 내부에 탐색해야 하는 파일이 너무 많다면 Github API 규정에 의해 Rate Limit이 발생할 수 있습니다(`403 Forbidden`). 불필요한 API 요청을 막기 위해 4단계 이상의 디렉토리가 감지되면 API 요청을 중단하도록 설정했습니다.
+
+#### 문제점 1. 90일 이내 업데이트하지 않은 사용자 대응 어려움
+
+그러나 이러한 방법에는 큰 문제점이 있습니다. 사용자의 코드를 REST API를 통해 가져오게 되지만, REST API는 [최근 업데이트된 리포지토리에 대한 정보를 90일 동안만 저장](https://docs.github.com/ko/actions/administering-github-actions/usage-limits-billing-and-administration?utm_source=chatgpt.com#artifact-and-log-retention-policy)합니다. 만약 90일 이전에 업데이트된 리포지토리가 없다면 내용을 불러올 수 없다는 것입니다.
+
+또한 사용자의 입장에서 생각한다면 프로젝트 내의 모든 파일을 다 살피지 않는 경우가 더 많습니다. 이 프로젝트의 목적인 사용자가 "최근에 업데이트 한 내용에 대해 상기시킨다."라는 부분에서는 리포지토리의 모든 코드를 가져오는 것은 맞지 않다고 생각했습니다.
+
+#### 문제점 2. GitHub API Rate Limit 문제 발생 가능성 높음
+
+리포지토리를 탐지하는 경우 디렉토리를 4단계 이상 요청을 보내지 못 하도록 제한하고 있지만, 만약 리포지토리 자체의 크기가 크다면 [Rate Limi](https://docs.github.com/ko/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)t을 피할 수 없다는 문제점이 있습니다. GitHub REST API의 Rate Limit은 시간 당 5,000개로 제한하게 되는데, 파일 혹은 디렉토리 하나에 한 번의 요청을 보내야 한다는 점에서 불필요한 요청이 많아지게 됩니다.
+
+가장 최근 업데이트된 리포지토리를 가져오는 과정은 아래와 같습니다.
+
+> 1. 사용자가 로그인 시 Github Token을 요청
+> 2. 가장 최근에 업데이트된 리포지토리 정보를 요청
+> 3. 리포지토리 내부를 탐색하며 파일 요청(디렉토리의 깊이는 4단계로 제한)
+> 4. 받아온 파일 내부 코드 요청
+
+이때 리포지토리 내부를 탐색하며 파일을 가져올 때, 파일 내부 코드를 요청할 때에도 파일 당 한 번의 요청을 보내게 됩니다. 만약 리포지토리 내부에 탐색해야 할 파일이 많거나, 코드를 요청해야 할 파일이 많은 경우 Rate Limit에 걸릴 가능성이 높아지게 됩니다. 하지만 사용자의 리포지토리가 얼마나 큰지 알 수 없으며, 이러한 문제를 해결하기 위한 명확하게 해결하기는 어렵습니다.
+
+#### 문제점 3. 사용자가 작성한 코드를 구분하기 어려움
+
+리포지토리 전체를 탐색하는 경우 명확하게 사용자가 작성한 파일이 어떤 것이 알기 어렵습니다. `.js`, `.ts` 등과 같이 추상적인 방법으로 최대한 구분해낼 순 있지만, 완벽한 방식은 아닙니다. 또한 만약 팀 프로젝트의 리포지토리인 경우 어떤 사용자가 작성한 코드인지 리포지토리 요청을 통해서는 확인하기 어렵다고 판단했습니다.
+
+이러한 문제로 다른 방식을 사용해 사용자의 최신 코드를 가져오기로 했습니다.
+
+### 2. 최근 커밋에서 수정된 파일 가져오기
+
+다른 방법은 최근 커밋에서 수정된 파일만 가져오는 것입니다. Commit API를 통해 사용자의 커밋 내역을 요청하게 되며, 이런 방식은 리포지토리의 단점을 보완할 수 있다고 판단했습니다.
+
+#### 1. 오래도록 업데이트하지 않은 사용자에 대한 처리 가능
+
+GitHub의 REST API에서 리포지토리는 90일 동안 업데이트되지 않으면 검색되지 않지만, 커밋 내역은 삭제되지 않고 계속 유지됩니다. 즉, 사용자가 90일 이상 리포지토리를 수정하지 않았더라도, 기존 커밋 기록을 조회하여 최근에 변경한 파일을 가져올 수 있습니다.
+
+이 방식의 장점은 다음과 같습니다.
+
+> 1. **오래된 프로젝트도 조회 가능** <br />
+>    - 90일 이상 업데이트하지 않은 리포지토리라도 과거의 커밋 기록을 활용하여 파일을 가져올 수 있음.
+> 2. **사용자가 수정한 최신 코드만 가져오기 가능** <br />
+>    - 리포지토리 전체가 아니라, 사용자가 최근에 변경한 코드만 가져올 수 있음.
+> 3. **프로젝트별 최신 작업 반영** <br />
+>    - 특정 프로젝트를 장기간 작업하지 않았다가 다시 시작했을 때도 유용하게 동작.
+
+#### 2. GitHub API Rate Limit의 가능성 감소
+
+EST API를 통해 리포지토리 전체 파일을 가져오는 방식과 비교했을 때, 최근 커밋에서 수정된 파일만 가져오면 API 호출 횟수를 크게 줄일 수 있습니다.
+
+- 리포지토리 전체 파일 탐색 방식
+
+  - GET /repos/{owner}/{repo}/contents/ (디렉토리별 API 요청)
+  - 디렉토리 내부에 있는 모든 파일을 순차적으로 조회 → 요청 횟수 급증
+  - 파일 수가 많을 경우 Rate Limit(5000회/시간)을 쉽게 초과
+
+- 커밋 내역을 활용한 방식
+  - GET /repos/{owner}/{repo}/commits?author={username} (사용자별 커밋 조회)
+  - 가장 최근 커밋의 변경된 파일 리스트 조회
+  - 변경된 파일만 가져오기 → 필요한 파일만 요청하여 API 사용량 절약 가능
+
+#### 3. 사용자가 작성한 코드를 구분할 수 있음
+
+기존 방식(리포지토리 전체 파일 탐색)에서는 리포지토리 내 모든 파일을 가져오기 때문에, 어떤 파일이 사용자가 직접 작성한 것인지 구별하기 어려운 문제가 있었습니다.
+
+하지만 커밋 API에서는 명확하게 사용자가 작성한 변경 사항을 확인할 수 있습니다. 커밋 정보에는 "author" 필드가 포함되며, 이 정보를 통해 어떤 사용자가 코드 변경을 했는지 정확히 확인할 수 있습니다.
+
+## 구현 기능 2. 기상 미션 퀴즈 생성하기
+
+사용자의 코드를 정확하게 분석하기 위해서는 parser를 사용해야 한다고 판단했습니다.
+
+이를 위해 여러 parser 라이브러리를 비교했습니다. 우선적으로 코드를 분석하는 것에는 정확성이 가장 중요하다 생각했기 때문에, 여러 프로그래밍 언어의 문법을 제공해 주는 라이브러리를 사용해야겠다고 판단했습니다. 그에 따라 가장 많이 사용되는 `ANTLR4`, `Tree-Sitter` 두 가지 라이브러리를 비교했습니다.
+
+|             | 제공하는 언어                                                               | 장점                                                                                                                    | 단점                                                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ANTLR4      | C++14, JavaScript, Python, Java 등<br>(공식 및 커뮤니티에서 일부 문법 제공) | - Lexer와 Parser를 구분해 정의 가능<br>- 복잡한 문법을 처리할 때도 안정적인 성능                                        | - 문법 정의가 직관적이지 않음<br>- 파싱 과정에서 복잡한 데이터 구조를 사용하여 메모리 사용량이 많을 수 있음<br>- 복잡한 문법 처리 기능으로 인해 라이브러리 무게 증가 |
+| Tree-sitter | JavaScript, Python, C, Java, TypeScript 등 여러 프로그래밍 언어 제공        | - JSON 형태의 AST 출력<br>- 많은 언어에 대한 기존 문법 제공<br>- 순수 C로 작성된 경량 라이브러리로 리소스 사용량이 적음 | - 다른 언어로의 직접적인 코드 생성은 제한적<br>- AST 기반의 분석만 가능                                                                                              |
+
+이 두 가지의 라이브러리 중 AST 기반의 분석을 하고 리소스 사용량이 적은 `Tree-sitter`가 더 제 프로젝트에 적합하다 생각했습니다. 그래서 `Tree-sitter`를 통해 사용자의 코드를 파싱하려고 시도했습니다.
+
+### 1. Tree-sitter 사용 중 실행 환경 문제로 인한 에러 발생
+
+`Tree-sitter`를 사용할 때는 프로그래밍 언어의 문법을 정의되어 있는 또 다른 라이브러리를 설치하게 됩니다. 그러나 프로젝트를 Build 과정에서 아래와 같은 에러가 발생했습니다.
+
+![tree-sitter 실행 환경 에러](https://github.com/user-attachments/assets/36af8456-a538-47a2-9978-5cc639c58a29)
+
+에러 발생 원인은 `tree-sitter-javascript` 라이브러리가 Node 표준 라이브러리인 `path`를 가져오려고 시도한다는 것이었습니다. Node.js는 다양한 빌트인 모듈(built-in modules, 설치 시 기본적으로 제공되는 모듈)을 제공하는 표준 라이브러리(Standard Library)를 포함하고 있습니다.
+
+이 프로젝트는 안드로이드 애플리케이션이기 때문에 Node를 사용하지 않아 `tree-sitter-javascript`가 필요로 하는 Node 표준 라이브러리를 제공하지 못 해서 발생한 문제였습니다. 이러한 문제를 해결하기 위해 두 가지 해결 방안을 생각하게 되었습니다.
+
+> 1. Nodejs-mobile-react-native 라이브러리 활용하기
+> 2. WebView 사용하기
+
+### 문제점 1. Node 버전으로 인한 Node.js 라이브러리 사용 어려움
+
+React Native 라이브러리 중 `Node.js` 환경을 제공하는 라이브러리가 있다는 것을 알게 되었습니다. `Nodejs-mobile-react-native`를 설치하게 되면 프로젝트 내부에 또다른 `Node.js` 환경의 프로젝트가 생성되며, 이곳에 필요한 라이브러리도 설치할 수 있게 됩니다. 다만 이 라이브러리의 경우 Node의 버전이 18을 필요로 한다는 점 때문에 Node 버전을 18로 다운그레이드 후 진행했습니다.
+
+<img src="https://github.com/user-attachments/assets/38d9975d-3522-4039-85ef-4fc3e88f89c7" width="500" />
+
+그러나 빌드를 시도할 때 위와 같은 에러가 발생하게 됩니다. 이 에러는 허용되지 않는 아키텍처가 포함되어 있다는 내용으로, `nodsjs-mobile-react-native`의 경우 `x86` 아키텍처를 지원하지 않지만, 빌드 대상에는 `x86` 아키텍처가 존재한다는 것입니다.
+
+이 문제를 해결하기 위해서는 `nodejs-mobile-react-native`의 이전 버전으로 다운그레이드 하면 된다는 해결법을 발견했지만, 그렇게 되면 `Node`의 버전을 다시 다운그레이드해야 했습니다. React Native에서는 최소 `18.18` 이상의 Node 버전을 요구하기 때문에 이 방식은 맞지 않다고 판단했습니다.
+
+#### 문제점 2. 프로젝트 assets 폴더 접근 불가능으로 인한 WebView 사용 어려움
+
+먼저 Web에서 `Tree-sitter`를 사용하기 위해서는 `web-tree-sitter`라는 또 다른 라이브러리를 사용해야 합니다. 기본적으로 `Tree-sitter`는 c 언어로 작성되었기 때문에 웹 환경에서는 동작하기 어렵습니다.
+이 때문에 웹에서는 고성능 웹 애플리케이션을 실행할 수 있도록 설계된 저수준(바이너리) 명령어인 webAssembly(WASM)로 컴파일된 `web-tree-sitter`를 사용해 실행할 수 있습니다. 이때 언어에 대한 문법은 `tree-sitter-javascript.wasm` 파일로 제공됩니다.
+
+`WebView`는 모바일 어플리케이션에서 웹 콘텐츠(웹 페이지)를 표시하는 컴포넌트입니다. 네이티브 앱 내부에 `HTML`, `CSS`, `JavaScript`로 작성된 웹 페이지를 렌더링하게 됩니다.
+
+<img src="https://github.com/user-attachments/assets/9daa88e1-6b9a-432a-b95c-dec15d11fcb7" width="300" />
+
+여기서 또 다른 문제가 발생하게 됩니다. `WebView` 내부에서 작성된 `JavaScript`의 경우, React Native 프로젝트 폴더에 있는 파일에 접근할 수 없게 됩니다. 그렇기 때문에 `tree-sitter-javascript.wasm` 파일에도 접근할 수 없게 됩니다.
+
+이러한 이유로 `Tree-sitter`가 아닌 다른 parser 라이브러리를 사용해야겠다는 결론을 내리게 되었습니다.
+
+### 2. peggy를 활용해 분석하기
+
+React Native에서 실행되는 parser 라이브러리 중 peggy를 선택하게 된 이유는 아래와 같습니다.
+
+> 1. PEG 기반의 문법을 사용하여 사람이 읽고 이해하기 쉬운 문법을 작성할 수 있다.
+> 2. 가볍고 빠른 Pasing이 가능하다.
+> 3. 어떤 환경에 의존하여 동작하지 않기 때문에 React Native에서도 실행이 가능하다.
+
+peggy 라이브러리의 경우 PEG 문법을 기반으로 합니다. PEG 문법이란 형식 언어를 나타내는 문법의 일종으로, 프로그래밍 언어 및 기타 구조적 데이터를 구문 분석하는 데 사용됩니다.
+
+사용자의 코드에서 함수 이름, 매개 변수, 반환값 등의 값을 활용해 퀴즈의 정답을 지정하게 됩니다. 이때 퀴즈의 정답으로 활용될 값을 전부 AST로 추출해 추출된 값들 중 랜덤하게 하나를 지정하게 됩니다. 
+
+> [!NOTE] 
+> **AST(Abstract Syntax Tree)란?** <br />
+> 추상 구문 트리(abstract syntax tree, AST), 또는 구문 트리(syntax tree)는 프로그래밍 언어로 작성된 소스 코드의 추상 구문 구조의 트리이다. 이 트리의 각 노드는 소스 코드에서 발생되는 구조를 나타낸다.
 
 <details>
-<summary>가장 최근 리포지토리를 가져오도록 엔드포인트 지정하기</summary>
+<summary>peggy를 활용해 함수 이름, 매개 변수, 반환값을 AST 데이터로 추출하기(코드)</summary>
 
-```js
-const url = `https://api.github.com/users/${userName}/repos?sort=updated&direction=desc&per_page=1`;
-```
-- `sort=updated`: 리포지토리를 업데이트 된 시간 기준으로 정렬합니다.
-- `direction=desc`: 내림차순으로 정렬하여 최신 리포지토리가 첫 번째로 오게 합니다.
-- `per_page=1`: 가장 최신 리포지토리 한 개만 가지고 옵니다.
-
-</details>
-
-파일의 경우 한 파일 당 한 번의 요청을 보내야 합니다. 만약 리포지토리 내부 파일의 타입이 디렉토리일 경우 함수를 재귀적으로 호출하여 다시 탐색하도록 합니다. 이 과정을 반복하여 모든 디렉토리 내부의 파일을 가져와 저장합니다.
-
-### (2) REST API 사용량 제한 피하기
-
-#### 깊은 리포지토리 탐색 시 요청량 초과 피하기
-
-만약 리포지토리 내부에 탐색해야 하는 파일이 너무 많다면 Github API 요청 제한이 걸립니다. `REST API`의 경우 리포지토리의 모든 디렉토리를 탐색합니다.
-만약 리포지토리에 `node_modules`와 같이 폴더에 내부 폴더가 많은 파일까지 탐색하게 된다면 API 요청 수가 급격히 증가하여 `403 Forbidden` 응답과 함께 `“API rate limit exceeded”` 메시지를 받게 됩니다.
-
-이런 현상을 방지하기 위해 파일의 깊이를 제한하여 탐색하도록 했습니다. [리액트의 레거시 공식 문서](https://legacy.reactjs.org/docs/faq-structure.html#avoid-too-much-nesting)에서는 보통 3-4단계의 깊이를 유지하도록 권장하고 있습니다. 때문에 API가 탐색하는 최대 깊이는 4단계로 지정했습니다.
-
-#### 이미 방문했던 경로의 재방문 막기
-
-또한 이미 방문했던 경로이고, 가져온 이후에 마지막 커밋이 변경되지 않았다면 재탐색을 방지하는 로직을 설정하여 요쳥량 제한을 피하려고 노력했습니다.
-
-### (3) 파일 필터링 하기
-이렇게 받아온 파일은 필터링을 해 필요한 파일만 데이터에 저장하게 됩니다. 이떄 필요한 파일이란 사용자가 작성한 코드가 있는 파일을 말합니다. 사용자가 작성한 코드를 직접적으로 알 수 없기 때문에 기준을 세워 최대한 가능성을 높이기 위해 노력했습니다. 그 기준은 아래와 같습니다.
-
-1. `README.md`, `package.json`, `config.js` 등 설정 파일은 제외합니다.
-2. `node_modules/`, `.github/`, `dist/` 등 불필요한 경로는 제외합니다.
-3. 확장자가 `.js`, `.ts`, `.py` 등 프로그래밍 언어 확장자만 가지고 옵니다.
-
-Github REST API에서는 이 파일에 대해 미리 필터링을 해 주지 않습니다.  모든 파일을 가져온 후, 설정 파일 및 불필요한 경로를 걸러내고 `.js`의 확장자를 활용해 실제 코드 파일만 남깁니다.
-
-최종적으로 코드 파일 중에도 실제 코드 로직이 작성된 파일을 식별하기 위해 `function`, `class` 등의 코드 패턴을 포함한 파일을 데이터 베이스에 저장합니다.
-
-## [2] 사용자의 코드 분석하기
-
-사용자의 코드를 사용해 퀴즈를 낼 때 고려했던 것은 사용자가 답을 예측할 수 있는 퀴즈를 내는 것이었습니다. 단순히 코드를 일부 제거하는 것이 아니라, 맥락을 유지하면서 사용자가 충분히 이해할 수 있는 위치에서 빈칸을 생성해야 합니다. 그러기 위해서는 코드의 구조를 이해하고 의미 있는 부분을 추출하는 과정이 필요합니다. 
-
-이를 위해 함수 단위로 코드를 분석하고, 단계적으로 문제를 생성하는 방식을 적용했습니다.
-
-### (1) 파일에서 함수 분리하기
-
-함수는 대부분 자바스크립트에서 주요 동작을 담당하며, 내부에서 사용하는 변수나 조건식도 함수 내 또는 함수의 매개변수로 전달되기 때문에 사용자가 더 쉽게 맥락을 파악할 수 있을 것이라 생각했습니다. 
-
-모든 내용을 담고 있는 최상위 함수 단위로 코드를 추출합니다. 함수의 범위를 찾기 위해 `function`이라는 키워드를 찾습니다. 이후 중괄호 `{}`를 기준으로 여닫는 횟수를 세어 스코프를 파악합니다.
-
-```js
-const functionIndex = code.indexOf('function');
-const startIndex = code.indexOf('{', functionIndex);
-let count = 0;
-let endIndex = startIndex;
-
-for (let i = startIndex; i < code.length; i++) {
-	if (code[i] === '{') {
-		count++; // 여는 중괄호일 때는 더합니다.
-	} else if (code[i] === '}') {
-		count--; // 닫는 중괄호라면 뺍니다.
-	} 
-	
-	if (count === 0) {
-	  endIndex = i; // 만약 count가 0이라면 최상위 함수의 스코프가 끝났다고 가정합니다.
-	  
-	  break;
-	}
+```peg
+{
+  function extractParams(params) {
+    return params.map(param => param.name);
+  }
 }
 
-// startIndex과 endIndex + 1를 이용해 영역을 확인합니다.
-```
+Program
+  = statements:Statement* { return statements; }
 
-### (2) 함수의 반환 값 추출하기
+Statement
+  = FunctionDeclaration
+  / Other
 
-퀴즈는 `return` 값을 기준으로 빈칸이 생성됩니다. `return` 구문은 함수의 주요 역할을 나타냅니다. 이를 퀴즈의 빈칸으로 설정하면 사용자가 함수의 동작을 파악하고 답을 예측하기 더 수월할 것이라 생각했습니다.
-
-분리된 함수에서 `return` 값이 있는지 찾습니다. 만약 `return` 값이 없는 함수라면 문제에 적용시키지 않습니다. 값이 있다면 함수의 코드 블록 안에서 `return` 키워드가 포함된 줄을 찾습니다.
-
-```js
-  const returnStatements = [];
-  const lines = functionCode.split('\n');
-
-  for (const line of lines) {
-    if (line.trim().startsWith('return')) { 
-      returnStatements.push(line.trim()); // returnStatements = ["return sum;"]
+FunctionDeclaration
+  = "function" _ name:Identifier _ "(" params:ParameterList? ")" _ "{" body:Statement* "}"
+    {
+      return {
+        type: "FunctionDeclaration",
+        name,
+        params: params ? extractParams(params) : [],
+        body
+      };
     }
-  }
+
+ParameterList
+  = first:Identifier rest:(_ "," _ Identifier)* {
+      return [first, ...rest.map(r => r[3])];
+    }
+
+Identifier
+  = name:[a-zA-Z_$][a-zA-Z0-9_$]* {
+      return { type: "Identifier", name: name };
+    }
+
+Other
+  = [^]  { return { type: "Other", value: text() }; }
+
+_ "whitespace"
+  = [ \t\n\r]*
 ```
-
-이 코드에서는 `return sum;`을 반환 구문으로 추출합니다. 이렇게 추출된 반환 구문을 이용해 빈칸으로 변경하고, 데이터에 저장합니다.
-
-# 구현 기능 2. 알람 시간 감지해서 사용자에게 알려 주기
-
-제 앱의 또다른 목적은 사용자가 원하는 시간에 알람을 울려 주는 것입니다. 사용자가 등록한 시간에 이벤트를 실행하기 위해서는 앱이 켜지고 꺼져 있는지의 상태와 상관없이 앱에서 지속적으로 사용자가 등록한 시간을 인지해야 한다고 생각했습니다.
-
-## [1] React Native 라이브러리로 백그라운드 작업하기
-
-앱이 꺼져 있을 때도 시간을 인지하기 위해서는 백그라운드에서도 계속 동작하고 있어야 한다고 생각했습니다. 
-안드로이드에는 [Foreground Services](https://developer.android.com/develop/background-work/services/fgs?hl=ko)를 지원합니다. 이 서비스를 사용하면 사용자에게 직접적으로 보이지 않더라도 백그라운드에서 작업을 진행해야 할 때 사용할 수 있습니다. 사용자에게 작업이 진행 중이라는 명시적인 알림을 띄워 줘야 합니다. 보통 음악 재생, 피트니스 앱 등에 사용합니다.
-
-리액트 네이티브에서는 포그라운드 서비스를 사용할 수 있는 라이브러리가 존재합니다. 그 중에서도 저는 `react-native-background-fetch`와 `react-native-background-actions`이라는 라이브러리를 비교했습니다.
-
-### (1) react-native-background-fetch 사용해 작업하기
-
-[react-native-background-fetch](https://www.npmjs.com/package/react-native-background-fetch/v/3.0.1)는 포그라운드 서비스 라이브러리 중 가장 다운로드 수가 많습니다. 이 라이브러리는 약 15분마다 백그라운드에서 앱을 깨워 작업을 실행합니다.
-
-<details>
-<summary>react-native-background-fetch 백그라운드 작업 설정하기</summary>
-
-```js
-// 백그라운드 Fetch 초기화 함수 호출
-const initializeBackgroundFetch = async () => {
-  await BackgroundFetch.configure(
-	{
-	  minimumFetchInterval: 15, // 작업 호출 간격 (최소 15분)
-	  stopOnTerminate: false, // 앱 종료 시 작업 유지
-	  startOnBoot: true, // 디바이스 재부팅 시 작업 시작
-	  enableHeadless: true, // 백그라운드에서 독립 실행 허용
-	},
-	async (taskId) => {
-	  // 주기적으로 실행되는 작업
-	  addEvent(`${taskId} at ${new Date().toLocaleTimeString()}`);
-	  BackgroundFetch.finish(taskId); // 작업 종료 알림
-	},
-	(taskId) => {
-	  // 작업 타임아웃 시 호출
-	  BackgroundFetch.finish(taskId); // 작업 종료 알림
-	}
-  );
-};
-
-initializeBackgroundFetch();
-```
-
-**1. `BackgroundFetch.configure()`**
-
-- 백그라운드 작업을 설정합니다.
-- 첫 번째 인자는 설정 옵션 객체, 두 번째 인자는 백그라운드 이벤트 핸들러 함수, 세번 째 인자는 타임아웃 이벤트 핸들러 함수입니다.
-
-**2. `BackgroundFetch.start()`**
-
-- 백그라운드 작업을 수동으로 시작합니다.
-
-**3. `BackgroundFetch.stop()`**
-
-- 백그라운드 작업을 중지합니다.
-
-**4. `BackgroundFetch.finish(taskId)`**
-
-- 백그라운드 작업을 종료하고, 시스템에 완료를 알립니다. 이 함수를 호출하지 않으면 앱이 강제 종료될 수 있습니다.
-
 
 </details>
 
-#### ⚠️ 15분에 한 번만 작업을 수행하는 문제점
-
-background fetch는 15분에 한 번씩 작업을 수행합니다.
-
-<table style="border: 1px solid gray">
-	<tr>
-		<th>
-		<img width="489px" height="47px" alt="background fetch" src="https://github.com/user-attachments/assets/7146cfe5-2408-4b78-a352-177b97b29cd2" />
-		</th>
-	</tr>
-	<tr>
-		<td>background fetch</td>
-	<tr>
-</table>
-
-알람 애플리케이션 특성상 지속적인 시간 확인이 필요합니다. 만약 background fetch를 사용하면 사용자가 백그라운드 작업이 종료되고 15분 이내에 15분 이전의 알람을 맞추게 되면 사용자는 해당 알람을 들을 수 없습니다.
-
-이러한 부분에서의 한계점으로 인해 사용하지 않게 되었습니다.
-
-### (2) react-native-background-actions 사용해 작업하기
-
-`react-native-background-actions`는 포그라운드 서비스 라이브러리 중 두 번째로 사용 유저가 많았으며, 최근까지도 활발히 업데이트를 진행 중입니다. 
-
-<details>
-<summary>react-native-background-actions 백그라운드 작업 설정하기</summary>
+위 PEG 문법을 변환하여 생성된 parser를 사용자의 코드에 활용했을 때 아래와 같은 결과가 나오게 됩니다.
 
 ```js
-useEffect(() => {
-startBackgroundTask(); // 컴포넌트 마운트 시 작업 시작
-
-return () => {
-  stopBackgroundTask(); // 컴포넌트 언마운트 시 작업 중지
-};
-}, []);
-
-const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
-	
-	// 백그라운드 작업 함수
-	const startBackgroundTask = async () => {
-		const task = async (taskData) => {
-		  while (BackgroundActions.isRunning()) {
-			const currentTime = new Date().toLocaleTimeString();
-			addEvent(`Task running at ${currentTime}`);
-			await sleep(taskData.delay); // 1초 대기 후 반복 실행
-		  }
-		};
-		
-	const options = {
-	  taskName: "Background Task",
-	  taskTitle: "Task Running in Background",
-	  taskDesc: "This is a demo background task",
-	  taskIcon: {
-		name: "ic_launcher",
-		type: "mipmap",
-	  },
-	  color: "#0000ff",
-	  linkingURI: "myapp://", // 알림 클릭 시 앱 열기
-	  parameters: {
-		delay: 1000, // 1초마다 작업 실행
-	  },
-	};
-	
-	try {
-	  await BackgroundActions.start(task, options);
-	} catch (error) {
-	  console.error("[BackgroundActions] Failed to start task: ", error);
-	}
-};
-
-const stopBackgroundTask = async () => {
-	await BackgroundActions.stop(); // 작업 중지
-};
-```
-
-
-**1. `BackgroundActions.start(task, options)`**
-
-- 백그라운드 작업을 설정합니다.
-- 첫 번째 인자는 백그라운드에서 수행할 작업 및 번복 횟수, 그리고 두 번째 인자는 제목, 설명 등의 알림 설정 정보를 작성합니다.
-
-**3. `BackgroundActions.stop()`**
-
-- 백그라운드 작업을 중지합니다.
-
-**4. `sleep`**
-
-- 주어진 시간(밀리초)동안 대기하는 비동기 함수입니다.
-
-- 백그라운드 작업을 종료하고, 시스템에 완료를 알립니다. 이 함수를 호출하지 않으면 앱이 강제 종료될 수 있습니다.
-
-
-</details>
-
-#### 제한 없는 백그라운드 작업
-
-`react-native-background-actions`은 백그라운드에서 작업을 진행할 때 제한을 두지 않습니다. 알람 어플 특성대로 계속 백그라운드 작업을 실행할 수 있었습니다.
-
-<table style="border: 1px solid gray">
-	<tr>
-		<th>
-		<img width="389px" height="260px" alt="background actions" src="https://github.com/user-attachments/assets/a6038f4e-a35d-467d-abdb-6854f8e7b250" />
-		</th>
-	</tr>
-	<tr>
-		<td>background actions</td>
-	<tr>
-</table>
-
-이러한 이유로 `react-native-background-actions`을 선택했습니다.
-
-## [2] 백그라운드에서 시간 확인하기
-포그라운드 서비스를 이용하려면 안드로이드 기기에 포그라운드 서비스를 실행할 수 있도록 권한을 부여해야 합니다. 이 작업은 build가 된 상태에서 android 디렉토리 내부에 있는 `AndroidManifest` 파일에다 넣습니다.
-
-> **AndroidManifest란?**
-> 안드로이드 앱의 핵심 설정 파일입니다. 이 파일은 앱의 구성 정보를 정의하고 운영체제가 앱을 실행할 때 해당 설정을 기반으로 동작하도록 합니다.
-
-```xml
-<uses-permission android:name="android.permission.FOREGROUND_SERVI
-СЕ" />
-```
-
-이 코드를 작성하게 되면 애플리케이션에 포그라운드 서비스 실행 권한이 부여됩니다.
-
-<table style="border: 1px solid gray">
-	<tr>
-		<th>
-		<img width="389px" height="260px" alt="foreground service 권한 설정" src="https://github.com/user-attachments/assets/02e781d8-4f1a-4609-9a37-1791d1371bf3" />
-		</th>
-	</tr>
-	<tr>
-		<td>foreground service 권한 설정</td>
-	<tr>
-</table>
-
-
-이제 백그라운드에서 작업할 서비스를 설정하면 됩니다.
-
-Foreground Service를 활용해 사용자가 알람 시간을 등록하면 해당 데이터를 데이터베이스에 저장하고, 저장된 데이터를 앱의 상태에 유지하며 현재 시각과 등록된 알람 시간을 지속적으로 비교하도록 설계했습니다. 
-
-이렇게 지정된 작업은 사용자가 첫 알람을 등록했을 때 실행되며, 앱이 꺼진 상태에서도 작업을 진행됩니다. 
-
-
-포그라운드 서비스를 이용할 때에는 반드시 notification을 띄워 줘야 합니다. 명시적으로 작업을 진행해야 한다는 전제가 있기 때문입니다. notification은 `expo notification` 혹은 `react-native-notification` 등을 활용할 수 있습니다.
-
-```js
-// 알림 설정 (Expo Notification)
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-
-  // Foreground Service에 표시될 알림 함수
-  const showNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Background Task Running",
-        body: "This task is running in the background.",
-        data: { someData: "goes here" },
-      },
-      trigger: null, // 즉시 실행
-    });
-  };
-```
-
-이제 이렇게 하면 온전히 포그라운드 서비스를 이용할 수 있습니다. 이제 사용자가 알람을 등록한 시간이 되면 제가 원하는 이벤트를 발생시킬 수 있게 됩니다.
-
-# 개선할 사항
-
-## 1. 스케줄로 알람 예약하기
-
-### [1] 제한없는 Foreground Services로 인한 ANR 에러
-
-`react-native-background-actions`는 시간 제한없이 백그라운드 작업을 진행할 수 있습니다.
-
-이 라이브러리를 활용해 현재 시각과 등록된 알람 시간을 지속적으로 비교합니다. 앱이 꺼진 상태에서도 작업을 진행하게 됩니다.
-
-<details>
-<summary style="color: gray;">백그라운드에서 실행할 작업 설정하기</summary>
-
-```js
-const startBackgroundTask = async (allAlarmData) => {
-	if (allAlarmData !== null) {
-		const options = {
-		// ...
-		},
-		color: "#404040",
-		linkURL: "codebeep://ActionAlarm",
-		parameters: { allAlarmData: allAlarmData, delay: 1000 },
-		startForeground: true,
-		allowExecutionInForeground: true,
-	};
-
-	try {
-		await BackgroundService.start(checkTimeInBackground, options); // checkTimeInBackground: 백그라운드에서 실행할 함수
-	} catch (error) {
-		console.error(error.message);
-	}
+{
+  type: 'FunctionDeclaration',
+  name: {
+    start: 9,
+    end: 12,
+    type: 'functionName',
+    name: 'add'
+  },
+  variables: [
+    {
+      start: 13,
+      end: 14,
+      type: 'parameter',
+      name: 'a'
+    },
+    // ...
+  ]
+// ...
 }
 ```
 
-BackgroundService.start는 백그라운드 작업을 시작할 수 있도록 합니다.
+### 3. 기상 미션 퀴즈 생성하기
 
-</details>
+퀴즈를 생성하는 단계는 아래와 같습니다.
+
+> 1. AST 데이터를 탐색해 랜덤하게 하나의 값 추출하기
+>    - 이때 추출된 값은 퀴즈의 정답이 됩니다.
+> 2. 사용자의 코드에서 해당하는 값(퀴즈의 정답)이 있는 곳은 빈칸 처리하기
+>    - 빈칸 처리된 코드는 추후 알람이 울렸을 때 UI에 제공됩니다.
+
+#### AST 데이터를 탐색해 랜덤한 하나의 값 추출해 코드 빈칸 생성하기
+
+퀴즈의 정답은 모든 후보(함수 이름, 매개 변수, 반환 값)을 리스트에 넣고 랜덤하게 추출합니다. 이렇게 추출된 정답은 코드 내부에서 어느 위치에 있는지 start와 end 값을 이용해 찾게 됩니다.
+
+
+<img src="https://github.com/user-attachments/assets/36977d1e-9161-4688-b10c-b81c1d8059ca" width="300" />
+
+AST의 모든 요소를 하나의 리스트로 만들어 랜덤한 정답을 생성헀습니다. 이때 AST의 모든 변수(name, variables) 요소를 하나의 리스트로 만들기 위해 DFS 알고리즘을 활용하여 노드를 탐색했습니다.
+
+AST는 트리 구조이므로, 계층적인 구조를 가집니다.
+
+<img src="https://github.com/user-attachments/assets/b6641ac3-6fc9-44a3-bb29-d8d0bbc9f0eb" width="400" />
+<div style="color: gray;">-> Tree 구조 예시</div>
+<br />
+Tree 구조의 경우 한 노드가 여러 자식 노드를 가질 수 있습니다. 이때 DFS를 사용하면 루트에서 시작해 모든 자식 노드를 재귀적으로 방문 하면서 트리의 모든 노드를 탐색할 수 있습니다.
 
 <br />
-그러나 이 접근 방식에서 문제가 발생했습니다. 앱이 켜진 채로 5분 이상이 지난다면 "앱 응답하지 않음"이라는 경고창이 뜨며, 버튼 등의 UI 상호작용이 되지 않는다는 것입니다.
-
 <br />
 
-<table style="border: 1px solid gray">
-	<tr>
-		<th>
-		<img width="350" height="205px" alt="오류 화면" src="https://github.com/user-attachments/assets/1cd6723a-9306-4f8d-ac60-47b7f18c31f0" />
-		</th>
-	</tr>
-	<tr>
-		<td>ANR 오류 화면</td>
-	<tr>
-</table>
+> [!NOTE]
+> **DFS(Depth First Search) 알고리즘이란?** <br />
+> 깊이 우선 탐색 알고리즘으로, 트리나 그래프에서 한 루트로 탐색하다가 특정 상황에서 최대한 깊숙이 들어가서 확인한 뒤 다시 돌아가 다른 루트로 탐색하는 방식이다. 대표적으로 백트래킹(모든 경우의 수를 전부 고려하는 알고리즘)을 사용하는 알고리즘이다.
 
-<br />
+## 구현 기능 3. 등록된 알람 시간 확인하기
 
-로그캣을 확인한 결과, ANR 오류가 발생했음을 확인했으며, 이는 Foreground Service 작업이 제한 시간 내에 종료되지 않았기 때문입니다.
+용자가 등록한 시간에 알람을 제공하기 위해서는 애플리케이션 실행 여부와 상관없이 지속적으로 시간을 확인하고 있어야 한다고 생각했습니다. 그렇다면 애플리케이션이 꺼진 후에도 백그라운드에서 앱이 실행되어 있도록, 그래서 시간을 확인할 수 있도록 하면 되겠다는 생각을 했습니다.
 
-```bash
-ANR in com.miinje.codeBeep
-PID: 5472
-Reason: A foreground service of FOREGROUND_SERVICE_TYPE_SHORT_SERVICE did not stop within a timeout: 
-ComponentInfo{com.miinje.codeBeep/com.asterinet.react.bgactions.RNBackgroundActionsTask}
+### 1. Foreground Service를 사용해 백그라운드 작업 지정하기
+
+그래서 Android에서 제공하는 Foreground Service API를 활용하여 백그라운드 작업을 지정했습니다. Foreground Service란 사용자에게 직접적으로 보이지 않더라도 백그라운드에서 수행되어야 하는 작업을 위해 사용됩니다. React Native에서 이것을 지원하는 라이브러리인 `react-native-background-actions`를 사용했습니다.
+
+#### 1. react-native-background-actions 라이브러리 설치하기
+
+`react-native-background-actions`의 특징은 제한없이 백그라운드 작업을 실행할 수 있다는 것입니다. 시간을 확인하기 위한 작업에 적합하다 생각했습니다. Foreground Service를 사용하려면 애플리케이션이 권한을 요청해야 합니다. 권한 요청은 아래와 같은 네이티브 코드를 작성하게 됩니다.
+
+```kt
+<uses-permission android:name="android.permission.FOREGROUND_SERVIСЕ" />
 ```
 
-ANR(Application Not Responding) 오류는 일정 시간 동안 UI 스레드가 차단될 경우 발생하는 오류로, 일반적으로 5초 이상 UI 스레드가 응답하지 않으면 발생합니다.
+이렇게 라이브러리를 설치하게 되면 Native 코드와 함께 포함한 채로 설치가 됩니다. 아래와 같이 `node_modules` 내부 라이브러리 폴더에는 Android 폴더가 생성됩니다. 여기에 라이브러리에 필요한 Native 코드가 담겨 설치된 것입니다.
 
-`react-native-background-actions` 라이브러리로 작성된 코드는 실행된 위치와 관계없이 백그라운드 스레드에서 작업을 수행합니다. 현재 백그라운드에서는 사용자가 현재 시각을 지속적으로 확인합니다. 만약 등록된 시간과 현재 시각이 일치한다면 특정 동작을 수행하도록 합니다.
-
-```javascript
-while (true) {
-  const currentTime = new Date();
-  const currentHours = currentTime.getHours();
-  const currentMinutes = currentTime.getMinutes();
-  const currentDays = currentTime.getDay();
-
-  // ...
-
-  if (
-    convertedDays.includes(currentDays) &&
-    convertedSelectedTime.getHours() === currentHours &&
-    convertedSelectedTime.getMinutes() === currentMinutes
-  ) {
-    playAudio();
-    sendLocalNotification();
-  }
-}
+```zsh
+📂 node_modules/react-native-background-action
+├── CHANGELOG.md
+├── LICENSE
+├── README.md
+├── android // 이 곳에 Native 코드를 함께 설치하게 됩니다.
+...
 ```
 
-해당 작업을 종료시키지 않았기 때문에 과도하게 실행되어 메인(UI) 스레드까지 영향을 미치면서 ANR 오류가 발생했습니다.
+이렇게 설치된 Native 코드는 React Native의 Auto Link라는 기능으로 Native와 연결하게 됩니다. React Native 0.60 버전부터 자동 연결(Auto-linking) 기능이 추가되어, 네이티브 코드를 자동으로 프로젝트에 추가해 줍니다.
 
-하지만 현재 접근 방식에서는 알람 기능 특성상 지속적으로 시간을 확인해야 하므로 Foreground Service의 제한 시간 문제를 해결할 수 없었습니다. 이외에도 디바이스가 Doze(절전) 모드에 진입하는 경우 OS가 앱의 백그라운드 작업을 종료하기 때문에 이 경우에 대응하기 어렵습니다. 또한 지속적인 백그라운드 작업으로 인해 배터리 소모량이 매우 높아진다는 문제점도 있습니다.
+#### 2. Background 실행할 작업 설정하기
 
-이러한 문제점을 해결하기 위해 다른 방식을 사용해야 된다고 생각했습니다.
+백그라운드 작업의 순서는 이렇습니다.
 
-### [2] Alarm Manager를 이용해 알람 예약하기
+> 1. 현재 요일과 알람 데이터의 요일이 같은지 확인한다.
+> 2. 요일이 같다면 현재 시간을 지속적으로 상태에 저장한다.
+> 3. 현재 시간이 저장된 상태와 등록된 알람 데이터 중 일치하는 데이터가 있는지 확인한다.
+> 4. 현재 시간과 등록된 데이터의 시간이 일치한다면 상태를 변경한다.
 
-이를 해결하기 위해 [Alarm Manager API](https://developer.android.com/develop/background-work/services/alarms/schedule?hl=ko)를 사용하여 사용자가 등록한 알람 시간에 이벤트를 예약하는 방식이 적합하다고 판단했습니다. Alarm Manager는 시스템 알람 서비스에 대한 접근 권한을 제공하여 특정 시간에 애플리케이션을 실행하도록 예약할 수 있습니다.
+현재 요일과 알람 데이터에 일치하는 요일이 있는지 찾는 작업을 하는 이유는 불필요한 시간 확인을 막기 위해서였습니다. 만약 해당하는 시간과 요일을 함께 확인한다면 지속적으로 현재 시간을 확인하면서 요일을 확인하므로 불필요한 Background 스레드의 업데이트를 유발하기 때문입니다.
 
-이벤트를 예약하는 방식이기 때문에 백그라운드에서 시간을 계속 확인하지 않아도 됩니다. 이를 통해 백그라운드 스레드가 메인 스레드에 영향을 주지 않아 ANR 에러를 방지할 수 있습니다. Alarm Manager에서는 Doze 모드를 피할 수 있습니다. 또한 `setAlarmClock()` 및 `setExactAndAllowWhileIdle()` 메서드를 사용할 때 Doze 모드에서도 예외적으로 작업을 수행할 수 있도록 시스템에서 허용합니다.
+요일이 일치한다면 Background 스레드에서 반복적으로 현재 시간을 업데이트합니다. 업데이트된 시간과 등록된 알람 데이터의 시간을 확인하며 일치하는 데이터가 있는지 확인합니다. 이러한 과정을 거치며 데이터가 일치했을 때 Background 스레드에서 전역 상태를 업데이트하며, 업데이트된 전역 상태를 확인한 UI 스레드에서는 알람을 실행시킵니다.
 
-이를 통해 현재 발생하고 있는 문제를 해결할 수 있을 것이라 생각합니다.
+> [!NOTE]
+> **UI 스레드란?** <br /> 안드로이드 애플리케이션에서 사용자 인터페이스를 담당하는 메인 스레드로, 모든 UI 관련 작업을 처리하는 스레드입니다.
+> <br /> 안드로이드에는 UI 스레드/메인 스레드와 Background 스레드가 존재합니다.
+> <br />
+> <br /> **Background 스레드란?** <br /> UI 스레드와 별개로 동작하는 스레드로, 네트워크에서 데이터를 가져오는 등의 작업을 실행합니다.
 
-# 개인 회고
+### 2. ANR Error 발생 원인과 코드 개선하기
 
-개인 프로젝트를 진행하면서 혼자 모든 것을 해내야 한다는 것이 버겁게 느껴지는 경우가 있었습니다. 의사 결정이나 실행하는 것에 있어서 의견 공유가 필요없으니 진행이 빠른 반면에 제 생각에만 갇혀 이상한 길로 빠지는 경우도 있었습니다. 또한 처음 접해 보는 것들을 혼자 시도해 보려고 하니 시간에 쫓겨 제대로 해내지 못 한 부분들도 있는 것 같습니다. 
+`react-native-background-actions` 라이브러리는 시간 제한없이 백그라운드 작업을 설정할 수 있기 때문에 계속해서 현재 시간을 확인하고, 등록된 알람 시간과 비교했습니다. 그러나 이러한 작업 때문에 큰 에러가 발생했습니다.
+
+#### 1) Foreground Service로 인한 ANR 에러
+
+앱이 켜진 상태가 5분 이상 지속된다면, 앱이 응답하지 않는다는 경고창과 함께 UI 상호작용(버튼 클릭 등)이 막히게 됐습니다. 그리고 이러한 에러는 ANR 에러라고 하며, 이는 Foreground Service 작업이 제한 시간 내에 종료되지 않았기 때문에 발생한 것이었습니다.
+
+<img width="350" height="205px" alt="오류 화면" src="https://github.com/user-attachments/assets/1cd6723a-9306-4f8d-ac60-47b7f18c31f0" />
+
+ANR 에러는 일정 시간 이상 UI 스레드가 차단될 경우 발생하는 오류로, 일반적으로 5초 이상 UI 스레드가 응답하지 않으면 발생합니다.
+
+Foreground Service로 실행되는 로직은 Background 스레드에서 작업을 수행합니다. 이렇기 때문에 `react-native-background-actions` 라이브러리로 작성된 코드 또한 Background 스레드에서 동작하게 됩니다.
+
+현재 백그라운드에서 사용자가 현재 시각을 지속적으로 확인하고 있습니다. 이런 작업이 종료되지 않고 지속적으로 실행되어 UI 스레드의 영역까지 차지하게 되어 UI 스레드의 동작을 차단하게 됐습니다. 이런 원인을 위해 ANR 에러가 발생했습니다.
+
+**ANR 에러를 해결할 방법이 있을까?**
+
+하지만 Foregorund Service를 활용하는 경우, 이 접근 방식 외에는 방법이 없다고 생각했습니다. 시간을 지속적으로 확인해야만 알람을 정확한 시간에 울릴 수 있기 때문입니다. 이 문제 이외에도 안드로이드의 Doze(절전) 모드에 진입하는 경우 OS가 앱의 백그라운드 작업을 종료시키게 됩니다.
+
+> [!NOTE]
+> **[Doze 모드](https://developer.android.com/training/monitoring-device-state/doze-standby?hl=ko)란?** <br /> 기기가 전원에 연결되어 있지 않을 때 앱이 작동하는 방식을 관리하여 사용자의 배터리 수명을 연장하는 절전 기능 중 하나입니다. 잠자기 모드라고도 하며, 기기를 오랫동안 사용하지 않는 경우 앱의 백그라운드 CPU 및 네트워크 활동을 지연시켜 배터리 소모를 줄입니다.
+
+이러한 문제를 해결하기 위해 다른 방식을 사용해야 한다는 생각을 했습니다.
+
+#### 2) Alarm Manager를 이용해 기기에 알람 예약하기(진행 중)
+
+"OS 자체에 알람을 예약할 순 없을까?"라는 고민을 하게 되었습니다. 안드로이드에 존재하는 알람의 경우 **알람 또는 이벤트 리마인더 예약** 권한이 존재합니다. 이 권한에 대해 찾아 보니 [`AlarmManager`](https://developer.android.com/develop/background-work/services/alarms/schedule?hl=ko)를 사용하면 애플리케이션이 사용되지 않을 때에도 시간 기반 작업을 실행할 수 있다고 합니다.
+
+`AlarmManager`는 시스템 알람에 이벤트를 예약하는 방식입니다. 시스템 서비스에 접근할 수 있는 권한을 제공하며, 특정 시간에 애플리케이션을 실행하도록 예약할 수 있습니다.
+
+이를 통해 백그라운드 스레드가 메인 스레드에 영향을 주지 않아 ANR 에러를 방지할 수 있습니다. Alarm Manager에서는 Doze 모드를 피할 수 있습니다. 또한 `setAlarmClock()` 및 `setExactAndAllowWhileIdle()` 메서드를 사용할 때 Doze 모드에서도 예외적으로 작업을 수행할 수 있도록 시스템에서 허용합니다.
+
+이를 통해 현재 발생하고 있는 문제를 해결할 수 있을 것이라 생각했고, `AlarmManager` 방식을 사용하는 방향으로 프로젝트를 개선 중에 있습니다.
+
+## 개인 회고
+
+개인 프로젝트를 진행하면서 혼자 모든 것을 해내야 한다는 것이 버겁게 느껴지는 경우가 있었습니다. 의사 결정이나 실행하는 것에 있어서 의견 공유가 필요없으니 진행이 빠른 반면에 제 생각에만 갇혀 이상한 길로 빠지는 경우도 있었습니다. 또한 처음 접해 보는 것들을 혼자 시도해 보려고 하니 시간에 쫓겨 제대로 해내지 못 한 부분들도 있는 것 같습니다.
 
 하지만 기능의 우선순위를 계속 고민하고 프로젝트의 정체성에 대해 생각하며 더 나은 방향으로 진행하기 위해 했던 노력들로 점차 제길을 찾아간다는 느낌을 받기도 했습니다.
 
-아직 부족한 부분이 많으니 좀 더 업데이트를 진행하여 프로젝트를 발전시킬 생각입니다. 
+아직 부족한 부분이 많으니 좀 더 업데이트를 진행하여 프로젝트를 발전시킬 생각입니다.
