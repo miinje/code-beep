@@ -9,18 +9,13 @@ import {
   signInWithCredential,
 } from "firebase/auth";
 import { useEffect } from "react";
-import {
-  Image,
-  loginStylesLoginStylesheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import CustomText from "./components/CustomText/CustomText";
 
-import { auth, getAlarmData, saveReposCodeData } from "../firebaseConfig.mjs";
+import { auth, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
-import { fetchRecentRepo, getCodeFiles, getGithubUser } from "../utils/api";
+import { fetchCommitCode, getGithubUser } from "../utils/api";
 import { createTokenWithCode } from "../utils/createTokenWithCode";
 import { loginStyles } from "./styles";
 
@@ -36,7 +31,7 @@ const discovery = {
 
 export default function App() {
   const { allAlarmData, setAllAlarmData } = alarmStore();
-  const { setUserUid } = userStore();
+  const { setUserUid, setUserRepoCodeData } = userStore();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -85,19 +80,9 @@ export default function App() {
         setUserUid(user.uid);
 
         try {
-          const repoName = await fetchRecentRepo(accessToken, login);
-          const files = await getCodeFiles(accessToken, login, repoName);
-          const repoFilesData = {};
+          const commitFile = await fetchCommitCode(accessToken, login);
 
-          Object.keys(files).map((key) => {
-            const codeData = files[key];
-
-            if (files && codeData.path.slice(-3) === ".js") {
-              return (repoFilesData[key] = codeData);
-            }
-          });
-
-          saveReposCodeData(user.uid, repoName, repoFilesData);
+          setUserRepoCodeData(commitFile);
         } catch (error) {
           console.error("파일 가져오기 실패:", error);
         }
