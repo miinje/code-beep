@@ -18,99 +18,69 @@ export async function getGithubUser(token) {
   }
 }
 
-export async function fetchRecentRepo(userToken, userName) {
+async function fetchRecentRepo(token, userName) {
   const url = `https://api.github.com/users/${userName}/repos?sort=updated&direction=desc&per_page=1`;
 
   try {
     const response = await fetch(url, {
-      Authorization: `Bearer ${userToken}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     });
     const repos = await response.json();
+
     if (repos.length > 0) {
-      return repos[0].name;
+      return repos.map((data) => data.name);
     }
   } catch (error) {
     console.error("에러 발생:", error);
   }
 }
 
-async function fetchFilesRecursive(
-  accessToken,
-  owner,
-  repo,
-  visitedPaths,
-  path = "",
-  depth = 0,
-  maxDepth = 3
-) {
-  if (depth > maxDepth) return [];
-
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+async function fetchCommitInfo(token, userName, repo) {
+  const url = `http://api.github.com/repos/${userName}/${repo}/commits?sort=updated&direction=desc&per_page=1`;
   const HEADERS = {
-    Authorization: `Bearer ${accessToken}`,
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+  const commitInfo = {};
+
+  const response = await fetch(url, { headers: HEADERS })
+    .then((response) => response.json())
+    .then((data) => data)
+    .catch((err) => console.error(err));
+
+  commitInfo.repo = repo;
+  commitInfo.commitMessage = response[0].commit.message;
+  commitInfo.url = `https://github.com/${userName}/${repo}/commit/${response[0].sha}`;
+  commitInfo.sha = response[0].sha;
+
+  return commitInfo;
+}
+
+async function fetchCommitFile(token, userName, repo, ref) {
+  const url = `http://api.github.com/repos/${userName}/${repo}/commits/${ref}`;
+  const HEADERS = {
+    Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
 
-  if (visitedPaths.has(path)) {
-    return [];
-  }
-  visitedPaths.add(path);
+  const response = await fetch(url, { headers: HEADERS })
+    .then((response) => response.json())
+    .then((data) => data)
+    .catch((err) => console.error(err));
 
-  const response = await fetch(url, { headers: HEADERS });
-  const files = await response.json();
-
-  let codeFiles = [];
-
-  if (!Array.isArray(files)) {
-    codeFiles.push({ path: files.path, download_url: files.download_url });
-  } else {
-    for (const file of files) {
-      if (file.type === "dir") {
-        const nestedFiles = await fetchFilesRecursive(
-          accessToken,
-          owner,
-          repo,
-          visitedPaths,
-          file.path,
-          depth + 1,
-          maxDepth
-        );
-
-        codeFiles = codeFiles.concat(nestedFiles);
-      } else if (file.type === "file") {
-        codeFiles.push({ path: file.path, download_url: file.download_url });
-      }
-    }
-  }
-
-  return codeFiles;
+  return response;
 }
 
-export async function getCodeFiles(accessToken, userName, repo) {
-  const visitedPaths = new Set();
-  const filesWithCode = await fetchFilesRecursive(
-    accessToken,
+export async function fetchCommitCode(token, userName) {
+  const repoName = await fetchRecentRepo(token, userName);
+  const commitInfo = await fetchCommitInfo(token, userName, repoName[0]);
+  const file = await fetchCommitFile(
+    token,
     userName,
-    repo,
-    visitedPaths
+    repoName[0],
+    commitInfo.sha
   );
 
-  return filesWithCode;
-}
-
-export async function fetchFileContent(fileUrl) {
-  try {
-    const response = await fetch(fileUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const fileContent = await response.text();
-
-    return fileContent;
-  } catch (error) {
-    console.error("파일 가져오기 실패:", error);
-  }
+  return file;
 }
