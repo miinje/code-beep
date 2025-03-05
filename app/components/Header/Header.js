@@ -47,7 +47,16 @@ export default function Header({ deletedAlarms, setDeletedAlarms }) {
           style={styles.editButton}
           onPress={handleClickEditButton}
         >
-          <CustomText size={25} text={!isActivateEdit ? "편집" : "삭제"} />
+          <CustomText
+            size={25}
+            text={
+              !isActivateEdit
+                ? "편집"
+                : deletedAlarms.length === 0
+                  ? "취소"
+                  : "삭제"
+            }
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
