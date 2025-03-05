@@ -28,9 +28,11 @@ export default function extractQuizAnswer(ast) {
   }
   const randomIndex = Math.floor(Math.random() * result.length);
   const answer = result[randomIndex];
+  const location = resultLocation[answer];
 
   return {
     answer: answer,
-    location: resultLocation[answer],
+    start: location.start,
+    end: location.end,
   };
 }
