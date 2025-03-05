@@ -5,6 +5,7 @@ import { deleteAlarmData, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
+import parsingCode from "../utils/parsingCode";
 import CustomText from "./components/CustomText/CustomText";
 import Header from "./components/Header/Header";
 import { alarmListStyles } from "./styles";
@@ -44,9 +45,25 @@ export default function AlarmList() {
     const funcStartIndex = code.findIndex(
       (str) => str.includes("function") || str.includes("=>")
     );
+    let funcCode = code.slice(funcStartIndex).join("\n").trimEnd();
 
-    setAlarmQuiz(code.slice(funcStartIndex).join("\n"));
+    if (funcCode.endsWith(";")) {
+      funcCode = funcCode.slice(0, funcCode.length - 1);
+    }
 
+    if (
+      !funcCode.startsWith("var") &&
+      !funcCode.startsWith("let") &&
+      !funcCode.startsWith("const") &&
+      !funcCode.includes("=>")
+    ) {
+      funcCode = funcCode.slice(funcCode.indexOf("function"));
+    }
+
+    setAlarmQuiz(parsingCode(funcCode));
+  }, []);
+
+  useEffect(() => {
     const intervalId = setInterval(() => {
       const now = new Date();
 
