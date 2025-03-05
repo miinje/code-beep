@@ -1,16 +1,10 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import {
-  deleteAlarmData,
-  getAlarmData,
-  getReposCodeData,
-} from "../firebaseConfig.mjs";
+import { deleteAlarmData, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
-import { fetchFileContent } from "../utils/api";
 import { convertingStringDay } from "../utils/convertingDay";
-import { makeQuizFunction } from "../utils/makeQuizFunction";
 import CustomText from "./components/CustomText/CustomText";
 import Header from "./components/Header/Header";
 import { alarmListStyles } from "./styles";
@@ -29,46 +23,8 @@ export default function AlarmList() {
     setIsDeleteAlarm,
   } = alarmStore();
   const [isIncludedDay, setIncludedDay] = useState(false);
-  const { userUid, userRepoCodeData, setUserRepoCodeData } = userStore();
+  const { userUid, userRepoCodeData } = userStore();
   const [deletedAlarms, setDeletedAlarms] = useState([]);
-
-  useEffect(() => {
-    if (userRepoCodeData) {
-      Object.keys(userRepoCodeData).map((repoName) => {
-        const repoFiles = userRepoCodeData[repoName];
-
-        repoFiles.map(async (data) => {
-          const path = data.path;
-
-          if (path === "utils/convertingDay.js") {
-            const codeString = await fetchFileContent(data.download_url);
-            const funcQuiz = makeQuizFunction(codeString, data.path);
-
-            setAlarmQuiz(funcQuiz);
-          }
-        });
-      });
-    }
-  }, [userRepoCodeData]);
-
-  useEffect(() => {
-    if (userRepoCodeData) {
-      const getCodeData = async () => {
-        const codeData = await getReposCodeData(userUid);
-        const newCodeData = {};
-
-        Object.keys(codeData).map((key) => {
-          const newCodeDataArray = codeData[key].filter((data) => data);
-
-          newCodeData[key] = newCodeDataArray;
-        });
-
-        setUserRepoCodeData(newCodeData);
-      };
-
-      getCodeData();
-    }
-  }, []);
 
   useEffect(() => {
     const currentDay = convertingStringDay(new Date().getDay());
@@ -84,6 +40,13 @@ export default function AlarmList() {
   }, [allAlarmData]);
 
   useEffect(() => {
+    const code = userRepoCodeData.fileContent.split("\n");
+    const funcStartIndex = code.findIndex(
+      (str) => str.includes("function") || str.includes("=>")
+    );
+
+    setAlarmQuiz(code.slice(funcStartIndex).join("\n"));
+
     const intervalId = setInterval(() => {
       const now = new Date();
 
