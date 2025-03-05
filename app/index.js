@@ -79,12 +79,18 @@ export default function App() {
 
         setUserUid(user.uid);
 
-        try {
-          const commitFile = await fetchCommitCode(accessToken, login);
+        const dateObject = new Date();
+        const STORAGE_KEY = `${dateObject.getFullYear()}.${dateObject.getMonth()}.${dateObject.getDate()}`;
+        const storedData = await AsyncStorage.getItem(STORAGE_KEY);
 
-          setUserRepoCodeData(commitFile);
-        } catch (error) {
-          console.error("파일 가져오기 실패:", error);
+        if (storedData === null) {
+          try {
+            const commitFile = await fetchCommitCode(accessToken, login);
+
+            setUserRepoCodeData(commitFile);
+          } catch (error) {
+            console.error("파일 가져오기 실패:", error);
+          }
         }
 
         setAllAlarmData(await getAlarmData(user.uid));
@@ -93,6 +99,22 @@ export default function App() {
       }
     });
   }, [allAlarmData]);
+
+  useEffect(() => {
+    const deleteYesterdayData = async () => {
+      const dateObject = new Date();
+      const STORAGE_KEY = `${dateObject.getFullYear()}.${dateObject.getMonth()}.${dateObject.getDate() - 1}`;
+      const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+
+      if (storedData) {
+        await AsyncStorage.removeItem(STORAGE_KEY);
+      } else {
+        return;
+      }
+    };
+
+    deleteYesterdayData();
+  }, []);
 
   return (
     <View style={loginStyles.container}>

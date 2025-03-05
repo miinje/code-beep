@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -5,12 +6,11 @@ import { deleteAlarmData, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
+import extractQuizAnswer from "../utils/extractQuizAnswer";
 import parsingCode from "../utils/parsingCode";
 import CustomText from "./components/CustomText/CustomText";
 import Header from "./components/Header/Header";
 import { alarmListStyles } from "./styles";
-import extractFunctionInfo from "../utils/extractQuizAnswer";
-import extractQuizAnswer from "../utils/extractQuizAnswer";
 
 export default function AlarmList() {
   const {
@@ -22,7 +22,6 @@ export default function AlarmList() {
     setAllAlarmData,
     setIsTimeMatched,
     setCurrentTime,
-    setAlarmQuiz,
     setIsDeleteAlarm,
   } = alarmStore();
   const [isIncludedDay, setIncludedDay] = useState(false);
@@ -43,7 +42,15 @@ export default function AlarmList() {
   }, [allAlarmData]);
 
   useEffect(() => {
-    const saveQuizAnswer = () => {
+    const STORAGE_KEY = `${currentTime.getFullYear()}.${currentTime.getMonth()}.${currentTime.getDate()}`;
+
+    const saveQuizAnswer = async () => {
+      const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+
+      if (storedData) {
+        return;
+      }
+
       const code = userRepoCodeData.fileContent.split("\n");
       const funcStartIndex = code.findIndex(
         (str) => str.includes("function") || str.includes("=>")
@@ -86,7 +93,17 @@ export default function AlarmList() {
         answer.push(codeArray[codeArray.length - 1]);
       }
 
-      return answer.join("\n");
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          commitMessage: userRepoCodeData.commitMessage,
+          answer: result.answer,
+          quiz: answer,
+          repo: userRepoCodeData.repo,
+          fileName: userRepoCodeData.fileName,
+          url: userRepoCodeData.commitUrl,
+        })
+      );
     };
 
     saveQuizAnswer();
