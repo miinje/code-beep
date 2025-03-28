@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   signInWithCredential,
 } from "firebase/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import CustomText from "./components/CustomText/CustomText";
 
@@ -30,8 +30,9 @@ const discovery = {
 };
 
 export default function App() {
-  const { allAlarmData, setAllAlarmData } = alarmStore();
+  const { setAllAlarmData } = alarmStore();
   const { setUserUid, setUserRepoCodeData } = userStore();
+  const [isAutoLoggedIn, setIsAutoLoggedIn] = useState(false);
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID,
@@ -40,6 +41,50 @@ export default function App() {
     },
     discovery
   );
+
+  async function autoLogin() {
+    const accessToken = await AsyncStorage.getItem("github_access_token");
+    const credential = GithubAuthProvider.credential(accessToken);
+
+    if (!accessToken) {
+      setIsAutoLoggedIn(false);
+
+      return;
+    }
+
+    try {
+      await signInWithCredential(auth, credential);
+
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const { login } = await getGithubUser(accessToken);
+
+          setUserUid(user.uid);
+
+          const dateObject = new Date();
+          const STORAGE_KEY = `${dateObject.getFullYear()}.${dateObject.getMonth()}.${dateObject.getDate()}`;
+          const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+
+          if (storedData === null) {
+            try {
+              const commitFile = await fetchCommitCode(accessToken, login);
+
+              setUserRepoCodeData(commitFile);
+            } catch (error) {
+              console.error("파일 가져오기 실패:", error);
+            }
+          }
+
+          setAllAlarmData(await getAlarmData(user.uid));
+          setIsAutoLoggedIn(true);
+
+          router.replace("/AlarmList");
+        }
+      });
+    } catch (error) {
+      console.error("자동 로그인 실패:", error);
+    }
+  }
 
   async function handleResponse() {
     if (response.type === "success") {
@@ -55,9 +100,32 @@ export default function App() {
 
       try {
         onAuthStateChanged(auth, async (user) => {
-          const allAlarmData = await getAlarmData(user.uid);
+          if (user) {
+            const accessToken = await AsyncStorage.getItem(
+              "github_access_token"
+            );
+            const { login } = await getGithubUser(accessToken);
 
-          setAllAlarmData(allAlarmData);
+            setUserUid(user.uid);
+
+            const dateObject = new Date();
+            const STORAGE_KEY = `${dateObject.getFullYear()}.${dateObject.getMonth()}.${dateObject.getDate()}`;
+            const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+
+            if (storedData === null) {
+              try {
+                const commitFile = await fetchCommitCode(accessToken, login);
+
+                setUserRepoCodeData(commitFile);
+              } catch (error) {
+                console.error("파일 가져오기 실패:", error);
+              }
+            }
+
+            setAllAlarmData(await getAlarmData(user.uid));
+
+            router.replace("/AlarmList");
+          }
         });
       } catch (error) {
         console.error(error);
@@ -68,37 +136,14 @@ export default function App() {
   }
 
   useEffect(() => {
-    handleResponse();
-  }, [response]);
+    autoLogin();
+  }, []);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const accessToken = await AsyncStorage.getItem("github_access_token");
-        const { login } = await getGithubUser(accessToken);
-
-        setUserUid(user.uid);
-
-        const dateObject = new Date();
-        const STORAGE_KEY = `${dateObject.getFullYear()}.${dateObject.getMonth()}.${dateObject.getDate()}`;
-        const storedData = await AsyncStorage.getItem(STORAGE_KEY);
-
-        if (storedData === null) {
-          try {
-            const commitFile = await fetchCommitCode(accessToken, login);
-
-            setUserRepoCodeData(commitFile);
-          } catch (error) {
-            console.error("파일 가져오기 실패:", error);
-          }
-        }
-
-        setAllAlarmData(await getAlarmData(user.uid));
-
-        router.replace("/AlarmList");
-      }
-    });
-  }, [allAlarmData]);
+    if (!isAutoLoggedIn) {
+      handleResponse();
+    }
+  }, [isAutoLoggedIn]);
 
   useEffect(() => {
     const deleteYesterdayData = async () => {
