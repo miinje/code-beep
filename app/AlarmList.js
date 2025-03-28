@@ -5,10 +5,10 @@ import { deleteAlarmData, getAlarmData } from "../firebaseConfig.mjs";
 import alarmStore from "../store/alarmStore";
 import userStore from "../store/userStore";
 import { convertingStringDay } from "../utils/convertingDay";
+import saveQuizAnswer from "../utils/saveQuizAnswer";
 import CustomText from "./components/CustomText/CustomText";
 import Header from "./components/Header/Header";
 import { alarmListStyles } from "./styles";
-import saveQuizAnswer from "../utils/saveQuizAnswer";
 
 export default function AlarmList() {
   const {
@@ -40,7 +40,15 @@ export default function AlarmList() {
   }, [allAlarmData]);
 
   useEffect(() => {
-    saveQuizAnswer(userRepoCodeData);
+    const STORAGE_KEY = `${currentTime.getFullYear()}.${currentTime.getMonth()}.${currentTime.getDate()}`;
+
+    const saveAnswer = async () => {
+      const answerObject = saveQuizAnswer(userRepoCodeData);
+
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(answerObject));
+    };
+
+    saveAnswer();
   }, []);
 
   useEffect(() => {

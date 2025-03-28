@@ -1,14 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import extractQuizAnswer from "./extractQuizAnswer";
 import parsingCode from "./parsingCode";
 
-export default async function saveQuizAnswer(userRepoCodeData) {
-  const STORAGE_KEY = `${currentTime.getFullYear()}.${currentTime.getMonth()}.${currentTime.getDate()}`;
-  const storedData = await AsyncStorage.getItem(STORAGE_KEY);
-
-  if (storedData) {
-    return;
-  }
-
+export default function saveQuizAnswer(userRepoCodeData) {
   const code = userRepoCodeData.fileContent.split("\n");
   const funcStartIndex = code.findIndex(
     (str) => str.includes("function") || str.includes("=>")
@@ -31,15 +24,12 @@ export default async function saveQuizAnswer(userRepoCodeData) {
   const ast = parsingCode(funcCode);
 
   if (!ast) {
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        commitMessage: userRepoCodeData.commitMessage,
-        repo: userRepoCodeData.repo,
-        fileName: userRepoCodeData.fileName,
-        url: userRepoCodeData.commitUrl,
-      })
-    );
+    return {
+      commitMessage: userRepoCodeData.commitMessage,
+      repo: userRepoCodeData.repo,
+      fileName: userRepoCodeData.fileName,
+      url: userRepoCodeData.commitUrl,
+    };
   } else {
     const result = extractQuizAnswer(ast);
     const blankCode =
@@ -63,16 +53,13 @@ export default async function saveQuizAnswer(userRepoCodeData) {
       answer.push(codeArray[codeArray.length - 1]);
     }
 
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        commitMessage: userRepoCodeData.commitMessage,
-        answer: result.answer,
-        quiz: answer,
-        repo: userRepoCodeData.repo,
-        fileName: userRepoCodeData.fileName,
-        url: userRepoCodeData.commitUrl,
-      })
-    );
+    return {
+      commitMessage: userRepoCodeData.commitMessage,
+      answer: result.answer,
+      quiz: answer,
+      repo: userRepoCodeData.repo,
+      fileName: userRepoCodeData.fileName,
+      url: userRepoCodeData.commitUrl,
+    };
   }
 }
